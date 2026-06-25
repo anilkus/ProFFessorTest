@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AkademiSkoru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1a1a;--ink2:#666;--ink3:#999;--ink4:#ccc;
+  --paper:#fff;--paper2:#f8f7f4;--paper3:#f0efe9;
+  --line:rgba(0,0,0,0.08);--line2:rgba(0,0,0,0.14);
+  --moss:#1a7a50;--moss2:#28a06a;--moss3:#e6f5ed;
+  --danger:#c03030;--warn:#8a5f00;
+  --serif:'Playfair Display',Georgia,serif;
+  --mono:'DM Mono','Courier New',monospace;
+  --sans:'DM Sans',-apple-system,sans-serif
+}
+@media(prefers-color-scheme:dark){:root{
+  --ink:#e8e4dc;--ink2:#9e9890;--ink3:#6a6560;--ink4:#3a3730;
+  --paper:#111009;--paper2:#181510;--paper3:#201d15;
+  --line:rgba(255,255,255,0.08);--line2:rgba(255,255,255,0.14);
+  --moss:#28a06a;--moss2:#3bbf7e;--moss3:#0c2e1c
+}}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--paper);z-index:100}
+.lmark{width:26px;height:26px;border-radius:4px;background:var(--moss);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0}
+.lname{font-family:var(--serif);font-style:italic;font-size:1.2rem;font-weight:400;color:var(--ink);margin-left:8px}
+.ltag{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:6px;letter-spacing:.2px}
+.logo{display:flex;align-items:center}
+.nav-tabs{display:flex;gap:1.5rem}
+.ntab{font-family:var(--mono);font-size:11px;color:var(--ink3);background:none;border:none;cursor:pointer;padding:4px 0;letter-spacing:.3px;text-transform:lowercase;position:relative;display:flex;align-items:center;gap:5px;transition:color .12s}
+.ntab:hover{color:var(--ink2)}
+.ntab.on{color:var(--ink)}
+.ntab.on::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--moss)}
+.ntab.gold.on{color:var(--moss)}
+.ntab.gold.on::after{background:var(--moss)}
+#admin-badge{background:var(--moss);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;margin-left:3px;font-family:var(--mono)}
+.nav-right{font-family:var(--mono);font-size:10px;color:var(--ink4);display:flex;align-items:center;gap:5px}
+.ndot{width:5px;height:5px;border-radius:50%;background:var(--moss2)}
+
+/* WRAP */
+.wrap{max-width:860px;margin:0 auto;padding:0 2.5rem 4rem}
+.page{display:none}.page.on{display:block}
+
+/* GÖSTERIM PANELİ */
+.demo-wrap{background:var(--paper2);border-bottom:1px solid var(--line);padding:2.5rem 2.5rem 2rem}
+.demo-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.5rem}
+.demo-label{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.5px;text-transform:uppercase}
+.demo-title{font-family:var(--serif);font-style:italic;font-size:1.6rem;font-weight:400;color:var(--ink)}
+.step-nav{display:flex;gap:0;border:1px solid var(--line2);border-radius:4px;overflow:hidden}
+.step-btn{font-family:var(--mono);font-size:10px;padding:5px 14px;background:transparent;border:none;border-right:1px solid var(--line2);color:var(--ink3);cursor:pointer;transition:all .15s;text-transform:lowercase;letter-spacing:.2px}
+.step-btn:last-child{border-right:none}
+.step-btn:hover{background:var(--paper3);color:var(--ink2)}
+.step-btn.on{background:var(--ink);color:var(--paper)}
+.demo-body{min-height:220px;position:relative}
+.dpanel{display:none;animation:dfade .35s ease}
+.dpanel.on{display:block}
+@keyframes dfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:1rem}
+.demo-col-label{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--line)}
+.demo-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:.75rem}
+.demo-stat{background:var(--paper);border:1px solid var(--line);padding:.6rem .8rem;border-radius:3px}
+.demo-stat-n{font-family:var(--serif);font-size:1.5rem;font-weight:400;line-height:1;color:var(--ink)}
+.demo-stat-l{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px}
+.demo-bar-row{display:flex;align-items:center;gap:.75rem;margin-bottom:6px}
+.demo-bar-label{font-family:var(--mono);font-size:10.5px;color:var(--ink2);min-width:120px;text-transform:lowercase}
+.demo-bar-track{flex:1;height:2px;background:var(--line2)}
+.demo-bar-fill{height:100%;background:var(--ink);transition:width 1s cubic-bezier(.4,0,.2,1)}
+.demo-bar-val{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:32px;text-align:right}
+.demo-yorum{border-left:2px solid var(--moss2);padding:.7rem 1rem;margin-bottom:.7rem;background:var(--paper);transition:all .4s}
+.demo-yorum .yr-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem}
+.demo-yorum .yr-rol{font-family:var(--mono);font-size:10px;color:var(--ink3);padding:1px 6px;border:1px solid var(--line)}
+.demo-yorum .yr-status{font-family:var(--mono);font-size:10px}
+.demo-yorum .yr-text{font-size:12.5px;color:var(--ink2);line-height:1.55}
+.demo-yorum.pending{border-left-color:var(--line2);opacity:.5}
+.demo-unvan{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.demo-unvan-item{}
+.demo-unvan-label{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:.4rem}
+.demo-unvan-num{font-family:var(--serif);font-size:2.8rem;font-weight:400;line-height:1;letter-spacing:-1.5px;color:var(--ink)}
+.demo-unvan-bar{height:1px;background:var(--line2);margin:.5rem 0}
+.demo-unvan-fill{height:100%;background:var(--moss2)}
+.demo-unvan-msg{font-size:12px;color:var(--ink2);line-height:1.5}
+.demo-input-mock{border-bottom:1px solid var(--line2);padding:5px 0;font-size:13.5px;color:var(--ink);margin-top:4px;min-height:28px;display:flex;align-items:center}
+.demo-input-mock .cursor{display:inline-block;width:1px;height:14px;background:var(--ink);margin-left:1px;animation:blink .8s step-end infinite;vertical-align:middle}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.demo-info-row{display:flex;gap:.6rem;margin-top:.5rem;align-items:baseline}
+.demo-info-n{font-family:var(--mono);font-size:9.5px;color:var(--ink4);min-width:18px}
+.demo-info-v{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.demo-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--line)}
+.demo-dots{display:flex;gap:5px}
+.d-dot{width:5px;height:5px;border-radius:50%;background:var(--line2);cursor:pointer;border:1px solid var(--line2);transition:all .15s}
+.d-dot.on{background:var(--ink);border-color:var(--ink)}
+.demo-progress{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+.demo-cta{font-family:var(--mono);font-size:11px;color:var(--moss);display:flex;align-items:center;gap:5px;cursor:pointer;background:none;border:none;padding:0;text-transform:lowercase;letter-spacing:.2px}
+.demo-cta:hover{color:var(--moss2)}
+
+/* HERO */
+.hero-wrap{border-bottom:1px solid var(--line);padding:2.5rem 0}
+.hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:0}
+.hero-left{padding-right:2.5rem;border-right:1px solid var(--line)}
+.hero-right{padding-left:2.5rem;display:flex;flex-direction:column;justify-content:space-between}
+.hero-no{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.4px;margin-bottom:.75rem}
+.hero-h1{font-family:var(--serif);font-size:2.6rem;font-weight:400;font-style:italic;line-height:1.1;letter-spacing:-.4px;color:var(--ink);margin-bottom:1.1rem}
+.hero-desc{font-size:13.5px;color:var(--ink2);line-height:1.75;max-width:300px;margin-bottom:1.5rem}
+.hero-cta{font-family:var(--mono);font-size:11px;color:var(--ink2);display:inline-flex;align-items:center;gap:5px;text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:2px;transition:color .12s}
+.hero-cta:hover{color:var(--ink)}
+.hero-sources{margin-top:auto}
+.hero-src-title{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:.75rem}
+.hero-src-item{display:flex;gap:.6rem;margin-bottom:.55rem;align-items:baseline}
+.hero-src-n{font-family:var(--mono);font-size:9.5px;color:var(--ink4);min-width:18px}
+.hero-src-v{font-size:12.5px;color:var(--ink2)}
+
+/* FORM */
+.form-section{padding:2rem 0;border-bottom:1px solid var(--line)}
+.section-no{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.4px;margin-bottom:.5rem}
+.section-title{font-family:var(--serif);font-style:italic;font-size:1.25rem;font-weight:400;color:var(--ink);margin-bottom:1.25rem}
+label{display:block;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:4px;letter-spacing:.3px;text-transform:lowercase}
+input,select,textarea{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line2);color:var(--ink);padding:6px 0;font-size:13.5px;font-family:var(--sans);outline:none;transition:border-color .12s;border-radius:0;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-bottom-color:var(--ink)}
+input::placeholder,textarea::placeholder{color:var(--ink4)}
+select option{background:var(--paper)}
+textarea{min-height:80px;border:1px solid var(--line2);padding:8px 10px;margin-top:4px}
+textarea:focus{border-color:var(--ink)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem}
+.form-note{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.75rem}
+
+/* BUTONLAR */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid var(--line2);background:transparent;color:var(--ink2);font-family:var(--mono);font-size:11px;cursor:pointer;text-transform:lowercase;letter-spacing:.2px;transition:all .12s;border-radius:3px}
+.btn:hover{background:var(--paper2);color:var(--ink);border-color:var(--ink3)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary:hover{background:var(--ink2);border-color:var(--ink2)}
+.btn-full{width:100%;justify-content:center}
+.btn.ok{background:var(--moss3);color:var(--moss);border-color:var(--moss2)}
+.btn.ok:hover{background:var(--moss2);color:#fff}
+.btn.danger{background:rgba(192,48,48,.06);color:var(--danger);border-color:rgba(192,48,48,.18)}
+
+/* HATA CFG */
+.errbx{border-left:2px solid var(--danger);padding:.65rem .9rem;font-size:12px;color:var(--danger);display:none;margin-top:.75rem;font-family:var(--mono)}
+.cfg-banner{display:none}
+
+/* PROGRESS */
+.prog{display:none;margin:1rem 0}.prog.on{display:block}
+.pbox{border-left:2px solid var(--line2);padding:1.1rem 1.4rem}
+.ptitle{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-bottom:.85rem;display:flex;align-items:center;gap:7px;text-transform:lowercase}
+.steps{display:flex;flex-direction:column;gap:7px}
+.step{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--ink4);text-transform:lowercase}
+.step.act{color:var(--ink)}.step.ok{color:var(--moss2)}.step.err{color:var(--danger)}
+.sic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;border:1px solid var(--line2)}
+.step.act .sic{border-color:var(--ink);color:var(--ink)}
+.step.ok .sic{border-color:var(--moss2);color:var(--moss2)}
+.step.err .sic{border-color:var(--danger);color:var(--danger)}
+@keyframes rot{to{transform:rotate(360deg)}}
+.spin{animation:rot 1s linear infinite;display:inline-block}
+
+/* DATA */
+.datapanel{display:none;border-top:1px solid var(--line);padding-top:1.25rem;margin-top:1.25rem}
+.datapanel.on{display:block}
+.dpgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:.75rem}
+.dpgrid2{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.dstat-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.2px;text-transform:lowercase;margin-bottom:.3rem}
+.dstat-val{font-family:var(--serif);font-size:1.7rem;font-weight:400;line-height:1;color:var(--ink);letter-spacing:-.4px}
+.dstat-sub{font-family:var(--mono);font-size:10px;color:var(--ink4);margin-top:2px}
+.src-tag{font-family:var(--mono);font-size:10px;display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--line)}
+.src-tag.ok{border-color:var(--moss2);color:var(--moss2)}
+.src-tag.no{color:var(--ink3)}
+
+/* RESULTS */
+.res{display:none}.res.on{display:block}
+.prof-split{display:grid;grid-template-columns:90px 1fr;gap:0;border-top:1px solid var(--line);padding:2rem 0}
+.prof-score{border-right:1px solid var(--line);padding-right:2rem;padding-top:.25rem}
+.score-big{font-family:var(--serif);font-size:3.8rem;font-weight:400;line-height:1;letter-spacing:-2px;color:var(--ink)}
+.score-max{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:3px}
+.score-gr{font-family:var(--mono);font-size:11px;margin-top:.5rem;color:var(--moss2)}
+.prof-body{padding-left:2rem}
+.prof-name{font-family:var(--serif);font-style:italic;font-size:1.3rem;font-weight:400;color:var(--ink);margin-bottom:2px}
+.prof-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-bottom:.9rem}
+.tagrow{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem}
+.tag{font-family:var(--mono);font-size:10px;padding:2px 7px;border:1px solid var(--line);color:var(--ink3)}
+.tag.green{border-color:var(--moss2);color:var(--moss2)}
+.tag.red{border-color:var(--danger);color:var(--danger)}
+.tag.orange{border-color:var(--warn);color:var(--warn)}
+.tag.accent{color:var(--ink2)}
+.dims{display:flex;flex-direction:column;gap:7px}
+.dimrow{display:flex;align-items:center;gap:9px}
+.dname{font-family:var(--mono);font-size:11px;color:var(--ink2);min-width:140px;text-transform:lowercase}
+.dtrack{flex:1;height:1px;background:var(--line2)}
+.dfill{height:100%}
+.dval{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:32px;text-align:right}
+.ucards{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
+.ucard{padding:1.5rem 0}
+.ucard+.ucard{padding-left:2rem;border-left:1px solid var(--line)}
+.ucard:not(:last-child){padding-right:2rem}
+.uclbl{font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:lowercase;letter-spacing:.2px;margin-bottom:.4rem}
+.ucnum{font-family:var(--serif);font-size:2.6rem;font-weight:400;line-height:1;letter-spacing:-1.5px;color:var(--ink);margin-bottom:.3rem}
+.ucbar{height:1px;background:var(--line2);margin:.5rem 0 .6rem}
+.ucfill{height:100%}
+.ucmsg{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.ucmsg b{font-weight:500;color:var(--ink);display:block;margin-bottom:2px}
+.ucexik{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:.4rem;line-height:1.8}
+.ucexik span{display:block;padding-left:10px;position:relative}
+.ucexik span::before{content:'–';position:absolute;left:0;color:var(--ink4)}
+.badge-down{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;padding:4px 10px;margin-top:.6rem;border:1px solid rgba(192,48,48,.22);color:var(--danger)}
+.bulg-wrap{border-top:1px solid var(--line);padding:1.5rem 0}
+.bulg{display:flex;gap:9px;padding:.65rem 0;border-bottom:1px solid var(--line)}
+.bulg:last-child{border-bottom:none}
+.bicon{font-size:12px;flex-shrink:0;margin-top:2px;color:var(--ink3)}
+.bbody{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.bbody b{font-weight:500;color:var(--ink);display:block;margin-bottom:1px;font-size:13px}
+.anal-wrap{border-top:1px solid var(--line);padding:1.5rem 0}
+.rawtext{font-family:var(--mono);font-size:11.5px;color:var(--ink2);line-height:1.85;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;border-left:2px solid var(--line2);padding-left:.9rem}
+.disc{font-family:var(--mono);font-size:10px;color:var(--ink4);line-height:1.7;margin-top:.85rem;display:flex;gap:6px}
+
+/* YORUM */
+.y-hero{border-top:1px solid var(--line);padding:1.5rem 0;margin-bottom:1rem}
+.y-meta h2{font-family:var(--serif);font-style:italic;font-size:1.1rem;font-weight:400;color:var(--ink);margin-bottom:2px}
+.y-meta .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+.score-row{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}
+.sp-val{font-family:var(--serif);font-size:1.4rem;font-weight:400;line-height:1;color:var(--ink)}
+.sp-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px;text-transform:lowercase}
+.impact-note{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:.75rem;padding:.55rem .85rem;border-left:2px solid var(--line2);line-height:1.6}
+.rol-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:1rem}
+.rol-btn{background:transparent;border:1px solid var(--line);padding:.4rem;font-family:var(--mono);font-size:11px;color:var(--ink3);cursor:pointer;text-align:center;transition:all .12s;text-transform:lowercase;border-radius:3px}
+.rol-btn:hover{color:var(--ink2);border-color:var(--line2)}
+.rol-btn.on{border-color:var(--ink);color:var(--ink)}
+.rol-weight{font-size:10px;color:var(--ink4);margin-top:1px}
+.star-row{display:flex;gap:4px;margin-top:4px}
+.star{font-size:18px;cursor:pointer;color:var(--ink4);user-select:none;transition:color .1s}
+.star.on{color:var(--ink)}
+.yf-cats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1rem}
+.cat-item{display:flex;align-items:center;justify-content:space-between;padding:.4rem .7rem;border:1px solid var(--line)}
+.cat-lbl{font-family:var(--mono);font-size:11px;color:var(--ink2);text-transform:lowercase}
+.cat-stars{display:flex;gap:2px}
+.cat-star{font-size:13px;cursor:pointer;color:var(--ink4);user-select:none}
+.cat-star.on{color:var(--ink)}
+.toast{display:none;border-left:2px solid var(--moss2);padding:.65rem 1rem;font-family:var(--mono);font-size:11px;color:var(--moss2);margin-top:.7rem;align-items:center;gap:7px}
+.toast.on{display:flex}
+.yorum-item{padding:.85rem 0;border-bottom:1px solid var(--line)}
+.yorum-item:last-child{border-bottom:none}
+.yi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.yi-meta{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.yi-rol{font-family:var(--mono);font-size:10px;padding:2px 6px;border:1px solid var(--line);color:var(--ink3)}
+.yi-stars{font-size:11px;color:var(--ink2)}
+.yi-date{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+.yi-text{font-size:12.5px;color:var(--ink2);line-height:1.65}
+.yi-cats{display:flex;gap:.3rem;flex-wrap:wrap;margin:.35rem 0}
+.yi-cat{font-family:var(--mono);font-size:10px;padding:2px 6px;border:1px solid var(--line);color:var(--ink3)}
+.add-hoca-row{display:grid;grid-template-columns:1fr 1fr auto;gap:.75rem;margin-top:1rem;align-items:flex-end}
+.empty{font-family:var(--mono);text-align:center;padding:2rem;font-size:11px;color:var(--ink3)}
+.loading{font-family:var(--mono);text-align:center;padding:1.5rem;font-size:11px;color:var(--ink3);display:flex;align-items:center;justify-content:center;gap:7px}
+.admin-login{max-width:380px;margin:4rem auto;padding:2rem;border:1px solid var(--line)}
+.admin-login h3{font-family:var(--serif);font-style:italic;font-size:1.1rem;font-weight:400;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.admin-panel{display:none}.admin-panel.on{display:block}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);margin-bottom:2rem}
+.astat{padding:1.25rem;text-align:center}
+.astat+.astat{border-left:1px solid var(--line)}
+.astat-val{font-family:var(--serif);font-size:2.4rem;font-weight:400;line-height:1;letter-spacing:-1px;color:var(--ink)}
+.astat-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:4px;text-transform:lowercase}
+.queue-item{border-bottom:1px solid var(--line);padding:1.1rem 0}
+.queue-item:last-child{border-bottom:none}
+.qi-hoca{font-family:var(--serif);font-style:italic;font-size:1rem;font-weight:400;margin-bottom:3px}
+.qi-meta{font-family:var(--mono);font-size:10.5px;color:var(--ink3);display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:.5rem}
+.qi-text{font-size:12.5px;color:var(--ink2);line-height:1.6;border-left:2px solid var(--line2);padding-left:.85rem;margin-bottom:.55rem}
+.qi-cats{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.55rem}
+.qi-actions{display:flex;gap:.5rem}
+
+@media(max-width:600px){
+  nav{padding:.9rem 1.25rem;flex-wrap:wrap;gap:.5rem}
+  .ntab.on::after{display:none}
+  .wrap{padding:0 1.25rem 3rem}
+  .demo-wrap{padding:1.5rem 1.25rem}
+  .demo-grid{grid-template-columns:1fr}
+  .hero-grid{grid-template-columns:1fr}
+  .hero-left{border-right:none;padding-right:0;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}
+  .hero-right{padding-left:0;padding-top:1.5rem}
+  .frow{display:flex;flex-direction:column}
+  .prof-split{grid-template-columns:1fr}
+  .prof-score{border-right:none;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:1rem}
+  .prof-body{padding-left:0;padding-top:1rem}
+  .ucards{grid-template-columns:1fr}
+  .ucard+.ucard{padding-left:0;border-left:none;border-top:1px solid var(--line)}
+  .admin-stats{grid-template-columns:1fr}
+  .astat+.astat{border-left:none;border-top:1px solid var(--line)}
+  .yf-cats,.rol-grid,.dpgrid{grid-template-columns:1fr 1fr}
+  .dpgrid2{grid-template-columns:1fr}
+  .add-hoca-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+  .add-hoca-row .btn{grid-column:1/-1}
+  h1{font-size:2rem}
+  .demo-stat-row{grid-template-columns:1fr 1fr}
+  .demo-unvan{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">
+    <div class="lmark"><span aria-hidden="true" style="font-size:13px">&#x25CA;</span></i></div>
+    <div><div class="lname" style="font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:15px;letter-spacing:-.2px">AkademiSkoru</div><div class="ltag">Akademik değerlendirme platformu</div></div>
+  </div>
+  <div class="nav-tabs">
+    <button class="ntab on" onclick="goPage('analiz',this)"><span aria-hidden="true">&#x2315;</span></i> Profil Analizi</button>
+    <button class="ntab" onclick="goPage('yorum',this)"><span aria-hidden="true">&#x2709;</span></i> Değerlendirmeler</button>
+    <button class="ntab gold" onclick="goPage('admin',this)">
+      <span aria-hidden="true">&#x25A1;</span></i> Admin
+      <span id="admin-badge" style="display:none;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:2px">0</span>
+    </button>
+  </div>
+  <div class="nav-right"><div class="ndot"></div><span class="mono" style="font-size:10px">OpenAlex · AI analiz</span></div>
+</nav>
+
+<div class="wrap">
+
+<div class="cfg-banner" id="cfg-banner" style="display:none"></div>
+
+<!-- ═══ ANALİZ ═══ -->
+<div class="page on" id="pg-analiz">
+  <!-- ═══ TANITIM BÖLÜMÜ ═══ -->
+  <div class="demo-wrap" id="tanitim-section">
+    <div class="demo-header">
+      <div>
+        <div class="demo-label">— nasıl çalışır</div>
+        <div class="demo-title">Dört adımda şeffaf değerlendirme</div>
+      </div>
+      <div class="step-nav">
+        <button class="step-btn on" data-step="0" onclick="goStep(0)">Arama</button>
+        <button class="step-btn" data-step="1" onclick="goStep(1)">Veri</button>
+        <button class="step-btn" data-step="2" onclick="goStep(2)">Öğrenci sesi</button>
+        <button class="step-btn" data-step="3" onclick="goStep(3)">Sonuç</button>
+      </div>
+    </div>
+
+    <div class="demo-body">
+
+      <!-- PANEL 0: Arama -->
+      <div class="dpanel on" id="dp0">
+        <div class="demo-grid">
+          <div>
+            <div class="demo-col-label">Yalnızca iki alan yeterli</div>
+            <div style="margin-bottom:1rem">
+              <label>akademisyen adı</label>
+              <div class="demo-input-mock"><span id="tw-demo"></span><span class="cursor"></span></div>
+            </div>
+            <div>
+              <label>üniversite</label>
+              <div class="demo-input-mock" style="color:var(--ink2)">Boğaziçi Üniversitesi</div>
+            </div>
+          </div>
+          <div>
+            <div class="demo-col-label">Sistem otomatik yapar</div>
+            <div class="demo-info-row"><div class="demo-info-n">01</div><div class="demo-info-v">OpenAlex'ten H-indeksi, atıf ve yayın verisi çeker</div></div>
+            <div class="demo-info-row"><div class="demo-info-n">02</div><div class="demo-info-v">Web'den proje, haber ve etik kayıt tarar</div></div>
+            <div class="demo-info-row"><div class="demo-info-n">03</div><div class="demo-info-v">Öğrenci yorumlarını ağırlıklı skorlar</div></div>
+            <div class="demo-info-row"><div class="demo-info-n">04</div><div class="demo-info-v">Unvan yeterliliği ve kariyer haritası üretir</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 1: Veri -->
+      <div class="dpanel" id="dp1">
+        <div class="demo-col-label" style="margin-bottom:.75rem">OpenAlex'ten otomatik çekilen veriler</div>
+        <div class="demo-stat-row">
+          <div class="demo-stat"><div class="demo-stat-n">12</div><div class="demo-stat-l">H-indeksi</div></div>
+          <div class="demo-stat"><div class="demo-stat-n">284</div><div class="demo-stat-l">atıf</div></div>
+          <div class="demo-stat"><div class="demo-stat-n">38</div><div class="demo-stat-l">yayın</div></div>
+          <div class="demo-stat"><div class="demo-stat-n">%24</div><div class="demo-stat-l">uluslararası</div></div>
+        </div>
+        <div class="demo-bar-row"><div class="demo-bar-label">araştırma etkisi</div><div class="demo-bar-track"><div class="demo-bar-fill" data-w="70" style="width:0%"></div></div><div class="demo-bar-val">21/30</div></div>
+        <div class="demo-bar-row"><div class="demo-bar-label">yayın kalitesi</div><div class="demo-bar-track"><div class="demo-bar-fill" data-w="55" style="width:0%"></div></div><div class="demo-bar-val">11/20</div></div>
+        <div class="demo-bar-row"><div class="demo-bar-label">uluslararasılık</div><div class="demo-bar-track"><div class="demo-bar-fill" data-w="40" style="width:0%"></div></div><div class="demo-bar-val">6/15</div></div>
+      </div>
+
+      <!-- PANEL 2: Öğrenci sesi -->
+      <div class="dpanel" id="dp2">
+        <div class="demo-col-label" style="margin-bottom:.75rem">Topluluk değerlendirmeleri — admin onaylı</div>
+        <div class="demo-yorum">
+          <div class="yr-head">
+            <span class="yr-rol">Öğrenci · 1.0×</span>
+            <span class="yr-status" style="color:var(--moss2)">✓ onaylandı</span>
+          </div>
+          <div class="yr-text">Ders içeriği güncel, konulara hakimiyeti çok iyi. Araştırma odaklı ödevler gerçekten öğretiyor.</div>
+        </div>
+        <div class="demo-yorum pending" id="demo-ap2">
+          <div class="yr-head">
+            <span class="yr-rol">Mezun · 1.2×</span>
+            <span class="yr-status" id="demo-ap2-lbl" style="color:var(--ink3)">◷ admin onayı bekleniyor</span>
+          </div>
+          <div class="yr-text">Doktora sürecimde en çok katkı sağlayan hocalardan biri.</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);border-left:2px solid var(--line2);padding-left:.75rem;margin-top:.5rem;line-height:1.7">
+          Rol ağırlıkları: meslektaş 1.5× &nbsp;·&nbsp; mezun 1.2× &nbsp;·&nbsp; öğrenci 1.0× &nbsp;·&nbsp; anonim 0.5×
+        </div>
+      </div>
+
+      <!-- PANEL 3: Sonuç -->
+      <div class="dpanel" id="dp3">
+        <div class="demo-grid">
+          <div>
+            <div class="demo-col-label" style="margin-bottom:.75rem">Genel değerlendirme</div>
+            <div style="display:flex;align-items:baseline;gap:.75rem;margin-bottom:1rem">
+              <span style="font-family:var(--serif);font-size:3.2rem;font-weight:400;line-height:1;letter-spacing:-2px;color:var(--ink)">71</span>
+              <span style="font-family:var(--mono);font-size:10px;color:var(--ink3)">/100 · İyi</span>
+            </div>
+            <div class="demo-bar-row"><div class="demo-bar-label">araştırma</div><div class="demo-bar-track"><div class="demo-bar-fill" style="width:70%"></div></div><div class="demo-bar-val">21/30</div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label">yayın kalitesi</div><div class="demo-bar-track"><div class="demo-bar-fill" style="width:55%"></div></div><div class="demo-bar-val">11/20</div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label">öğretim</div><div class="demo-bar-track"><div class="demo-bar-fill" style="width:75%"></div></div><div class="demo-bar-val">15/20</div></div>
+          </div>
+          <div>
+            <div class="demo-unvan">
+              <div class="demo-unvan-item">
+                <div class="demo-unvan-label">Mevcut unvan yeterliliği</div>
+                <div class="demo-unvan-num">72</div>
+                <div class="demo-unvan-bar"><div class="demo-unvan-fill" style="width:72%"></div></div>
+                <div class="demo-unvan-msg">Prof. Dr. unvanıyla uyumlu.</div>
+              </div>
+              <div class="demo-unvan-item" style="margin-top:1rem">
+                <div class="demo-unvan-label">Bir sonraki kademe</div>
+                <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:.3rem">En yüksek unvanda.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="demo-footer">
+      <div class="demo-dots" id="d-dots"></div>
+      <div class="demo-progress" id="d-progress">1 / 4</div>
+      <button class="demo-cta" onclick="document.getElementById('analiz-section').scrollIntoView({behavior:'smooth'})">
+        analiz başlat ↓
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ HERO ═══ -->
+  <div style="border-bottom:1px solid var(--line);padding:3rem 0 2.5rem">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+      <div style="padding-right:2rem;border-right:1px solid var(--line)">
+        <div class="section-no">— 001 / platform</div>
+        <h1>Türk akademisi için<br>şeffaf bir<br>değerlendirme.</h1>
+        <p style="font-size:13.5px;color:var(--ink2);margin-top:1.25rem;line-height:1.75;max-width:300px">Yayın sayısı değil, gerçek etki. H-indeksi, öğrenci sesi ve unvan uyumu tek platformda.</p>
+      </div>
+      <div style="padding-left:2rem;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div class="mono" style="font-size:10px;color:var(--ink3);letter-spacing:.3px;margin-bottom:.4rem">— veri kaynakları</div>
+          <div style="display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem">
+            <div style="display:flex;gap:.75rem;align-items:baseline"><span class="mono" style="font-size:10px;color:var(--ink4);min-width:20px">01</span><span style="font-size:12.5px;color:var(--ink2)">OpenAlex API — H-indeksi, atıf, uluslararası işbirliği</span></div>
+            <div style="display:flex;gap:.75rem;align-items:baseline"><span class="mono" style="font-size:10px;color:var(--ink4);min-width:20px">02</span><span style="font-size:12.5px;color:var(--ink2)">Topluluk yorumları — admin onaylı, ağırlıklı</span></div>
+            <div style="display:flex;gap:.75rem;align-items:baseline"><span class="mono" style="font-size:10px;color:var(--ink4);min-width:20px">03</span><span style="font-size:12.5px;color:var(--ink2)">Web araması — haber, proje, etik kayıt</span></div>
+          </div>
+        </div>
+        <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--line)">
+          <a href="#analiz-section" onclick="document.getElementById('analiz-section').scrollIntoView({behavior:'smooth'});return false;" style="font-family:var(--mono);font-size:11.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;text-decoration:none">
+            analiz başlat <span aria-hidden="true" style="font-size:12px">&#x2193;</span></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div id="analiz-section">
+  <div class="card">
+    <div style="padding:2rem 0 1.5rem;border-bottom:1px solid var(--line);margin-bottom:1.5rem"><div class="section-no">— 002 / analiz</div><div class="section-title">Akademisyen ara</div></div>
+    <div class="frow">
+      <div><label>Akademisyen adı soyadı</label><input type="text" id="fi" placeholder="Örn. Ayşe Kaya"></div>
+      <div><label>Unvan</label>
+        <select id="fu">
+          <optgroup label="Araştırma Görevlisi"><option>Arş. Gör.</option><option>Arş. Gör. Dr.</option></optgroup>
+          <optgroup label="Öğretim Görevlisi"><option>Öğr. Gör.</option><option>Öğr. Gör. Dr.</option></optgroup>
+          <optgroup label="Öğretim Üyesi"><option>Dr. Öğr. Üyesi</option><option selected>Doç. Dr.</option><option>Prof. Dr.</option></optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div><label>Üniversite</label>
+        <select id="funi">
+          <option value="">— Seçiniz —</option>
+          <optgroup label="Ankara"><option>Ankara Üniversitesi</option><option>Gazi Üniversitesi</option><option>Hacettepe Üniversitesi</option><option>Orta Doğu Teknik Üniversitesi</option><option>Ankara Yıldırım Beyazıt Üniversitesi</option><option>Ankara Hacı Bayram Veli Üniversitesi</option></optgroup>
+          <optgroup label="İstanbul"><option>İstanbul Üniversitesi</option><option>İstanbul Teknik Üniversitesi</option><option>Boğaziçi Üniversitesi</option><option>Marmara Üniversitesi</option><option>Yıldız Teknik Üniversitesi</option><option>Bilkent Üniversitesi</option><option>Koç Üniversitesi</option><option>Sabancı Üniversitesi</option><option>Bahçeşehir Üniversitesi</option><option>Özyeğin Üniversitesi</option></optgroup>
+          <optgroup label="İzmir"><option>Ege Üniversitesi</option><option>Dokuz Eylül Üniversitesi</option><option>İzmir Yüksek Teknoloji Enstitüsü</option><option>İzmir Kâtip Çelebi Üniversitesi</option></optgroup>
+          <optgroup label="Diğer"><option>Akdeniz Üniversitesi</option><option>Anadolu Üniversitesi</option><option>Atatürk Üniversitesi</option><option>Bursa Uludağ Üniversitesi</option><option>Çukurova Üniversitesi</option><option>Dicle Üniversitesi</option><option>Erciyes Üniversitesi</option><option>Eskişehir Teknik Üniversitesi</option><option>Eskişehir Osmangazi Üniversitesi</option><option>Fırat Üniversitesi</option><option>Gaziantep Üniversitesi</option><option>Gebze Teknik Üniversitesi</option><option>İnönü Üniversitesi</option><option>Karadeniz Teknik Üniversitesi</option><option>Kocaeli Üniversitesi</option><option>Konya Teknik Üniversitesi</option><option>Mersin Üniversitesi</option><option>Muğla Sıtkı Koçman Üniversitesi</option><option>Ondokuz Mayıs Üniversitesi</option><option>Pamukkale Üniversitesi</option><option>Sakarya Üniversitesi</option><option>Selçuk Üniversitesi</option><option>Sivas Cumhuriyet Üniversitesi</option><option>Süleyman Demirel Üniversitesi</option><option>TOBB Ekonomi ve Teknoloji Üniversitesi</option><option>Trakya Üniversitesi</option><option>Van Yüzüncü Yıl Üniversitesi</option><option>Yozgat Bozok Üniversitesi</option><option>Zonguldak Bülent Ecevit Üniversitesi</option></optgroup>
+        </select>
+      </div>
+      <div><label>Bölüm</label>
+        <select id="fbol">
+          <option value="">— Seçiniz —</option>
+          <optgroup label="Mühendislik"><option>Bilgisayar Mühendisliği</option><option>Elektrik-Elektronik Mühendisliği</option><option>Makine Mühendisliği</option><option>İnşaat Mühendisliği</option><option>Endüstri Mühendisliği</option><option>Yazılım Mühendisliği</option><option>Biyomedikal Mühendisliği</option><option>Çevre Mühendisliği</option></optgroup>
+          <optgroup label="Fen Bilimleri"><option>Matematik</option><option>Fizik</option><option>Kimya</option><option>Biyoloji</option><option>İstatistik</option><option>Moleküler Biyoloji ve Genetik</option></optgroup>
+          <optgroup label="Sosyal Bilimler"><option>İktisat</option><option>İşletme</option><option>Kamu Yönetimi</option><option>Siyaset Bilimi ve Uluslararası İlişkiler</option><option>Sosyoloji</option><option>Psikoloji</option><option>Hukuk</option><option>Tarih</option></optgroup>
+          <optgroup label="Eğitim"><option>Bilgisayar ve Öğretim Teknolojileri Eğitimi</option><option>Matematik Eğitimi</option><option>Fen Bilgisi Eğitimi</option><option>Türkçe Eğitimi</option><option>İngilizce Dili Eğitimi</option><option>Eğitim Bilimleri</option></optgroup>
+          <optgroup label="Sağlık"><option>Tıp</option><option>Diş Hekimliği</option><option>Eczacılık</option><option>Hemşirelik</option><option>Fizyoterapi ve Rehabilitasyon</option></optgroup>
+          <optgroup label="Meslek YO"><option>Bilgisayar Programcılığı</option><option>Muhasebe ve Vergi Uygulamaları</option><option>Lojistik</option><option>Turizm ve Otel İşletmeciliği</option></optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="errbx" id="a-err"></div>
+    <button class="btn primary btn-full" id="sbtn" onclick="baslat()" style="margin-top:.9rem"><span aria-hidden="true">&#x2315;</span></i> Profil Analizi Başlat</button>
+  </div>
+  <div class="prog" id="prog">
+    <div class="pbox">
+      <div class="ptitle"><span aria-hidden="true" style="color:var(--blue)">&#x25CC;</span></i><span id="ptxt">Başlatılıyor</span><span id="timerTxt" style="color:var(--t3);font-weight:400;font-size:11px;margin-left:4px"></span></div>
+      <div class="steps">
+        <div class="step" id="s1"><div class="sic"></div><span>OpenAlex'te yazar aranıyor</span></div>
+        <div class="step" id="s2"><div class="sic"></div><span>Yayın ve atıf verileri çekiliyor</span></div>
+        <div class="step" id="s3"><div class="sic"></div><span>Veri işleniyor</span></div>
+        <div class="step" id="s4"><div class="sic"></div><span>Web araması ve AI analizi</span></div>
+        <div class="step" id="s5"><div class="sic"></div><span>Rapor oluşturuluyor</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="datapanel" id="datapanel">
+    <div class="card" style="padding:1.25rem">
+      <div class="stitle"><span aria-hidden="true">&#x25A6;</span></i>Çekilen Ham Veriler<span id="dpSrc" style="font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px;font-size:11px"></span></div>
+      <div class="dpgrid" id="dpgrid"></div>
+      <div class="dpgrid2" id="dpgrid2"></div>
+    </div>
+  </div>
+  <div class="res" id="res">
+    <div class="prof-split">
+      <div class="prof-body"><div class="prof-name" id="risim"></div><div class="prof-sub" id="rsub"></div><div class="tagrow" id="rtags"></div></div>
+      <div class="prof-score"><div class="score-big" id="rpuan"></div><div class="score-max">/ 100</div><div class="score-gr" id="rgr"></div></div>
+    </div>
+    <div style="padding-left:2rem"><div class="dims" id="rdims"></div></div>
+    <div class="ucards" id="rucards"></div>
+    <div class="bulg-wrap"><div class="section-no">— bulgular</div><div id="rbulg" style="margin-top:.75rem"></div></div>
+    <div class="anal-wrap"><div class="section-no">— detaylı analiz</div><div class="rawtext" id="ranaliz" style="margin-top:.75rem"></div>
+      <div class="disc"><span aria-hidden="true">&#x25A1;</span><span>Araştırma verileri OpenAlex'ten otomatik çekilir. Öğretim ve etik boyutlar web taramasına dayanır. Resmi değerlendirme belgesi değildir.</span></div>
+    </div>
+    <div style="margin-top:.75rem;text-align:center">
+      <button class="btn primary" onclick="goToYorum()" style="background:var(--bg3);color:var(--t2);border:1px solid var(--brd2)"><span aria-hidden="true">&#x2709;</span></i> Bu hoca için değerlendirme yaz</button>
+    </div>
+  </div>
+  </div><!-- /analiz-section -->
+</div>
+
+<!-- ═══ YORUM ═══ -->
+<div class="page" id="pg-yorum">
+  <div class="card">
+    <div style="padding:2rem 0 1.5rem;border-bottom:1px solid var(--line);margin-bottom:1.5rem"><div class="section-no">— 003 / değerlendirmeler</div><div class="section-title">Akademisyen seç</div></div>
+    <label>Değerlendirmek istediğiniz akademisyen</label>
+    <select id="sel-hoca" onchange="loadProfil()" style="margin-bottom:8px"></select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+      <div><label>Ad soyad</label><input type="text" id="yeni-isim" placeholder="Örn. Ayşe Kaya"></div>
+      <div><label>Üniversite</label>
+        <select id="yeni-uni">
+          <option value="">— Seçiniz —</option>
+          <optgroup label="Ankara"><option>Ankara Üniversitesi</option><option>Gazi Üniversitesi</option><option>Hacettepe Üniversitesi</option><option>Orta Doğu Teknik Üniversitesi</option><option>Ankara Yıldırım Beyazıt Üniversitesi</option><option>Ankara Hacı Bayram Veli Üniversitesi</option></optgroup>
+          <optgroup label="İstanbul"><option>İstanbul Üniversitesi</option><option>İstanbul Teknik Üniversitesi</option><option>Boğaziçi Üniversitesi</option><option>Marmara Üniversitesi</option><option>Yıldız Teknik Üniversitesi</option><option>İstanbul Üniversitesi-Cerrahpaşa</option><option>Bilkent Üniversitesi</option><option>Koç Üniversitesi</option><option>Sabancı Üniversitesi</option><option>Bahçeşehir Üniversitesi</option><option>Özyeğin Üniversitesi</option><option>İstanbul Bilgi Üniversitesi</option><option>Kadir Has Üniversitesi</option></optgroup>
+          <optgroup label="İzmir"><option>Ege Üniversitesi</option><option>Dokuz Eylül Üniversitesi</option><option>İzmir Yüksek Teknoloji Enstitüsü</option><option>İzmir Kâtip Çelebi Üniversitesi</option><option>İzmir Demokrasi Üniversitesi</option></optgroup>
+          <optgroup label="Diğer Devlet"><option>Akdeniz Üniversitesi</option><option>Anadolu Üniversitesi</option><option>Atatürk Üniversitesi</option><option>Balıkesir Üniversitesi</option><option>Bursa Uludağ Üniversitesi</option><option>Çukurova Üniversitesi</option><option>Dicle Üniversitesi</option><option>Erciyes Üniversitesi</option><option>Eskişehir Teknik Üniversitesi</option><option>Eskişehir Osmangazi Üniversitesi</option><option>Fırat Üniversitesi</option><option>Gaziantep Üniversitesi</option><option>Gebze Teknik Üniversitesi</option><option>İnönü Üniversitesi</option><option>Karadeniz Teknik Üniversitesi</option><option>Kocaeli Üniversitesi</option><option>Konya Teknik Üniversitesi</option><option>Kütahya Dumlupınar Üniversitesi</option><option>Mersin Üniversitesi</option><option>Muğla Sıtkı Koçman Üniversitesi</option><option>Ondokuz Mayıs Üniversitesi</option><option>Pamukkale Üniversitesi</option><option>Sakarya Üniversitesi</option><option>Selçuk Üniversitesi</option><option>Sivas Cumhuriyet Üniversitesi</option><option>Süleyman Demirel Üniversitesi</option><option>TOBB Ekonomi ve Teknoloji Üniversitesi</option><option>Trakya Üniversitesi</option><option>Van Yüzüncü Yıl Üniversitesi</option><option>Yozgat Bozok Üniversitesi</option><option>Zonguldak Bülent Ecevit Üniversitesi</option></optgroup>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:flex-end">
+      <div style="flex:1"><label>Bölüm <span style="color:var(--t3);font-weight:400">(isteğe bağlı)</span></label>
+        <select id="yeni-bol">
+          <option value="">— Seçiniz —</option>
+          <optgroup label="Mühendislik"><option>Bilgisayar Mühendisliği</option><option>Elektrik-Elektronik Mühendisliği</option><option>Makine Mühendisliği</option><option>İnşaat Mühendisliği</option><option>Endüstri Mühendisliği</option><option>Yazılım Mühendisliği</option><option>Biyomedikal Mühendisliği</option></optgroup>
+          <optgroup label="Fen Bilimleri"><option>Matematik</option><option>Fizik</option><option>Kimya</option><option>Biyoloji</option><option>İstatistik</option></optgroup>
+          <optgroup label="Sosyal Bilimler"><option>İktisat</option><option>İşletme</option><option>Kamu Yönetimi</option><option>Siyaset Bilimi ve Uluslararası İlişkiler</option><option>Sosyoloji</option><option>Psikoloji</option><option>Hukuk</option><option>Tarih</option></optgroup>
+          <optgroup label="Eğitim"><option>Bilgisayar ve Öğretim Teknolojileri Eğitimi</option><option>Matematik Eğitimi</option><option>Fen Bilgisi Eğitimi</option><option>Türkçe Eğitimi</option><option>İngilizce Dili Eğitimi</option><option>Eğitim Bilimleri</option></optgroup>
+          <optgroup label="Sağlık"><option>Tıp</option><option>Diş Hekimliği</option><option>Eczacılık</option><option>Hemşirelik</option></optgroup>
+          <optgroup label="Meslek YO"><option>Bilgisayar Programcılığı</option><option>Muhasebe ve Vergi Uygulamaları</option><option>Lojistik</option></optgroup>
+        </select>
+      </div>
+      <button class="btn primary" onclick="hocaEkle()" style="padding:10px 18px;align-self:flex-end;flex-shrink:0"><span aria-hidden="true">&#x002B;</span></i>Ekle</button>
+    </div>
+  </div>
+  <div id="profil-alani" style="display:none">
+    <div class="prof-hero">
+      <div class="ph-top"><div class="av" id="ph-av"></div><div class="pmeta"><h2 id="ph-isim"></h2><div class="psub" id="ph-sub"></div></div></div>
+      <div class="score-row" id="ph-score"></div>
+      <div class="impact-note"><span aria-hidden="true" style="font-size:13px;flex-shrink:0;margin-top:1px">&#x2139;</span></i><span>Öğretim puanı onaylı yorumların ağırlıklı ortalamasından hesaplanır.</span></div>
+    </div>
+    <div class="card">
+      <div class="stitle"><span aria-hidden="true">&#x2709;</span>Değerlendirme Yaz</div>
+      <label style="margin-bottom:7px">Rolünüz <span style="color:var(--t3);font-weight:400">(puan ağırlığını belirler)</span></label>
+      <div class="rol-grid">
+        <div class="rol-btn on" data-rol="ogrenci" onclick="secRol(this)">Öğrenci<div class="rol-weight">1.0×</div></div>
+        <div class="rol-btn" data-rol="mezun" onclick="secRol(this)">Mezun<div class="rol-weight">1.2×</div></div>
+        <div class="rol-btn" data-rol="meslektas" onclick="secRol(this)">Meslektaş<div class="rol-weight">1.5×</div></div>
+        <div class="rol-btn" data-rol="anonim" onclick="secRol(this)">Anonim<div class="rol-weight">0.5×</div></div>
+      </div>
+      <div class="frow">
+        <div><label>Genel puan</label><div class="star-row" id="genel-stars"><span class="star" onclick="starTik(1)">★</span><span class="star" onclick="starTik(2)">★</span><span class="star" onclick="starTik(3)">★</span><span class="star" onclick="starTik(4)">★</span><span class="star" onclick="starTik(5)">★</span></div></div>
+        <div><label>Dönem <span style="color:var(--t3)">(isteğe bağlı)</span></label><input type="text" id="donem" placeholder="Örn. 2023-Güz"></div>
+      </div>
+      <label style="margin-bottom:7px">Kategorilere göre</label>
+      <div class="yf-cats" id="yf-cats">
+        <div class="cat-item"><span class="cat-lbl">📚 Ders anlatımı</span><div class="cat-stars" data-cat="ders"></div></div>
+        <div class="cat-item"><span class="cat-lbl">📩 Ulaşılabilirlik</span><div class="cat-stars" data-cat="ulasim"></div></div>
+        <div class="cat-item"><span class="cat-lbl">🔄 Güncel içerik</span><div class="cat-stars" data-cat="guncel"></div></div>
+        <div class="cat-item"><span class="cat-lbl">⚖️ Sınav adaleti</span><div class="cat-stars" data-cat="adalet"></div></div>
+      </div>
+      <div style="margin-bottom:10px"><label>Yorumunuz</label><textarea id="yorum-text" placeholder="Dersin verimini, hocanın tutumunu, güçlü ve zayıf yanlarını yazın. Kişisel saldırı içeren yorumlar onaylanmaz." style="min-height:90px"></textarea></div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <button class="btn primary" onclick="yorumGonder()"><span aria-hidden="true">&#x21E8;</span></i>Gönder</button>
+        <span style="font-size:11.5px;color:var(--t3)">Admin onayı sonrası yayınlanır</span>
+      </div>
+      <div class="toast" id="toast"><span aria-hidden="true">&#x2713;</span></i>Değerlendirmeniz alındı. Admin onayı bekleniyor.</div>
+      <div class="errbx" id="y-err"></div>
+    </div>
+    <div class="card">
+      <div class="section-no" style="margin-bottom:.75rem">— onaylanmış değerlendirmeler<span id="yorum-count" style="font-weight:400;text-transform:none;letter-spacing:0;margin-left:5px"></span></div>
+      <div id="yorum-liste"><div class="loading"><span aria-hidden="true" class="spin">&#x25CC;</span></i>Yükleniyor…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMİN ═══ -->
+<div class="page" id="pg-admin">
+  <div class="admin-login" id="admin-login">
+    <h3><span aria-hidden="true" style="color:var(--moss2)">&#x25A1;</span> Admin girişi</h3>
+    <div style="margin-bottom:10px"><label>Şifre</label><input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <div class="errbx" id="login-err" style="display:none">Hatalı şifre.</div>
+    <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem"><span aria-hidden="true">&#x2192;</span></i>Giriş</button>
+    <div style="font-size:11.5px;color:var(--t3);margin-top:.75rem">Şifre: <code style="background:var(--bg3);padding:1px 6px;border-radius:4px">admin123</code> — deploy öncesi değiştirin</div>
+  </div>
+  <div class="admin-panel" id="admin-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+      <div class="section-title">Admin paneli</div>
+      <button class="btn" onclick="adminLogout()" style="color:var(--ink3)"><span aria-hidden="true">&#x2190;</span></i>Çıkış</button>
+    </div>
+    <div class="admin-stats">
+      <div class="astat"><div class="astat-val" id="stat-b" style="color:var(--gold)">—</div><div class="astat-lbl">Bekleyen</div></div>
+      <div class="astat"><div class="astat-val" id="stat-o" style="color:var(--grn)">—</div><div class="astat-lbl">Onaylanan</div></div>
+      <div class="astat"><div class="astat-val" id="stat-r" style="color:var(--red)">—</div><div class="astat-lbl">Reddedilen</div></div>
+    </div>
+    <div class="section-no" style="margin-bottom:1rem">— onay kuyruğu</div>
+    <div id="kuyruk-liste"><div class="loading"><span aria-hidden="true" class="spin">&#x25CC;</span></i>Yükleniyor…</div></div>
+    <div class="section-no" style="margin-top:1.5rem;margin-bottom:1rem">— onaylananlar</div>
+    <div id="onaylanan-liste"><div class="loading"><span aria-hidden="true" class="spin">&#x25CC;</span></i>Yükleniyor…</div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ══ AYARLAR — BURAYA DOLDUR ══ */
+var SUPABASE_URL      = 'BURAYA_SUPABASE_URL';       // https://xxxx.supabase.co
+var SUPABASE_ANON_KEY = 'BURAYA_SUPABASE_ANON_KEY';  // eyJ...
+var ADMIN_PW          = 'admin123';                   // Deploy öncesi değiştir
+var EJS_PUBLIC_KEY    = 'BURAYA_EJS_PUBLIC_KEY';
+var EJS_SERVICE_ID    = 'BURAYA_EJS_SERVICE_ID';
+var EJS_ADMIN_TPL     = 'BURAYA_EJS_ADMIN_TPL';
+var ADMIN_EMAIL       = 'BURAYA_ADMIN_EMAIL';
+/* ══════════════════════════════ */
+
+var SB_READY = SUPABASE_URL !== 'BURAYA_SUPABASE_URL';
+
+
+/* ══ LOCAL FALLBACK (Supabase yokken localStorage kullan) ══ */
+var LS_KEY = 'as_db_v2';
+function lsGet(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{"hocalar":[],"yorumlar":[]}');}catch(e){return{hocalar:[],yorumlar:[]};}}
+function lsSet(db){try{localStorage.setItem(LS_KEY,JSON.stringify(db));}catch(e){}}
+function lsGetHocalar(cb){cb(lsGet().hocalar);}
+function lsInsertHoca(isim,uni,cb){
+  var db=lsGet();
+  var ex=db.hocalar.find(function(h){return h.isim.toLowerCase()===isim.toLowerCase();});
+  if(ex){cb(ex);return;}
+  var h={id:'h_'+Date.now(),isim:isim,uni:uni};
+  db.hocalar.push(h);lsSet(db);cb(h);
+}
+function lsGetYorumlar(hocaId,durum,cb){
+  var all=lsGet().yorumlar.filter(function(y){
+    return y.hoca_id===hocaId&&(!durum||y.durum===durum);
+  });
+  cb(all);
+}
+function lsGetAllYorumlar(durum,cb){
+  var all=lsGet().yorumlar.filter(function(y){return !durum||y.durum===durum;});
+  cb(all);
+}
+function lsInsertYorum(y,cb){
+  var db=lsGet();
+  db.yorumlar.push({
+    id:y.id,hoca_id:y.hocaId,rol:y.rol,genel:y.genel,
+    cats:y.cats,metin:y.text,donem:y.donem,
+    durum:'bekleyen',agirlik:y.agirlik,tarih:y.tarih
+  });
+  lsSet(db);cb({},null);
+}
+function lsUpdateDurum(id,durum,cb){
+  var db=lsGet();
+  db.yorumlar=db.yorumlar.map(function(y){return y.id===id?Object.assign({},y,{durum:durum}):y;});
+  lsSet(db);if(cb)cb();
+}
+
+/* ══ SUPABASE HELPERS ══ */
+function sbFetch(path, opts) {
+  return fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    }
+  }, opts || {}));
+}
+
+function sbGet(table, params) {
+  return sbFetch(table + '?' + (params||''), {method:'GET'});
+}
+
+function sbInsert(table, data) {
+  return sbFetch(table, {method:'POST', body: JSON.stringify(data)});
+}
+
+function sbUpdate(table, id, data) {
+  return sbFetch(table + '?id=eq.' + id, {
+    method:'PATCH',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+/* ══ HOCA İŞLEMLERİ ══ */
+function getHocalar(cb) {
+  if(!SB_READY){lsGetHocalar(cb);return;}
+  sbGet('hocalar', 'order=isim.asc')
+    .then(function(r){return r.json();})
+    .then(function(d){cb(Array.isArray(d)?d:[]);})
+    .catch(function(){lsGetHocalar(cb);});
+}
+
+function insertHoca(isim, uni, cb) {
+  if(!SB_READY){lsInsertHoca(isim,uni,function(h){cb(h,null);});return;}
+  var id = 'h_'+Date.now();
+  sbInsert('hocalar', {id:id, isim:isim, uni:uni})
+    .then(function(r){return r.json();})
+    .then(function(d){cb(Array.isArray(d)?d[0]:d, null);})
+    .catch(function(e){cb(null, e.message);});
+}
+
+function upsertHoca(isim, uni, cb) {
+  if(!SB_READY){lsInsertHoca(isim,uni,cb);return;}
+  // Önce var mı kontrol et
+  sbGet('hocalar', 'isim=eq.'+encodeURIComponent(isim)+'&limit=1')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(Array.isArray(d) && d.length>0){ cb(d[0]); return; }
+      insertHoca(isim, uni, function(h){ cb(h||{id:'h_'+Date.now(),isim:isim,uni:uni}); });
+    })
+    .catch(function(){cb({id:'h_'+Date.now(),isim:isim,uni:uni});});
+}
+
+/* ══ YORUM İŞLEMLERİ ══ */
+function getYorumlar(hocaId, durum, cb) {
+  if(!SB_READY){lsGetYorumlar(hocaId,durum,cb);return;}
+  var q = 'hoca_id=eq.'+hocaId;
+  if(durum) q += '&durum=eq.'+durum;
+  q += '&order=created_at.desc';
+  sbGet('yorumlar', q)
+    .then(function(r){return r.json();})
+    .then(function(d){cb(Array.isArray(d)?d:[]);})
+    .catch(function(){cb([]);});
+}
+
+function getAllYorumlar(durum, cb) {
+  if(!SB_READY){lsGetAllYorumlar(durum,cb);return;}
+  var q = durum ? 'durum=eq.'+durum : '';
+  q += (q?'&':'') + 'order=created_at.desc';
+  sbGet('yorumlar', q)
+    .then(function(r){return r.json();})
+    .then(function(d){cb(Array.isArray(d)?d:[]);})
+    .catch(function(){cb([]);});
+}
+
+function insertYorum(y, cb) {
+  if(!SB_READY){lsInsertYorum(y,cb);return;}
+  sbInsert('yorumlar', {
+    id: y.id, hoca_id: y.hocaId, rol: y.rol,
+    genel: y.genel, cats: y.cats, metin: y.text,
+    donem: y.donem, durum: 'bekleyen',
+    agirlik: y.agirlik, tarih: y.tarih
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){cb(d,null);})
+  .catch(function(e){cb(null,e.message);});
+}
+
+function updateYorumDurum(id, durum, cb) {
+  if(!SB_READY){lsUpdateDurum(id,durum,cb);return;}
+  sbUpdate('yorumlar', id, {durum:durum})
+    .then(function(){if(cb)cb();})
+    .catch(function(e){if(cb)cb(e);});
+}
+
+/* ══ PUAN HESAPLA ══ */
+var ROL_W = {ogrenci:1.0,mezun:1.2,meslektas:1.5,anonim:0.5};
+var ROL_LBL = {ogrenci:'Öğrenci',mezun:'Mezun',meslektas:'Meslektaş',anonim:'Anonim'};
+var ROL_BG = {ogrenci:'rgba(79,124,255,.15)',mezun:'rgba(34,201,122,.12)',meslektas:'rgba(167,139,250,.15)',anonim:'rgba(61,78,106,.2)'};
+var ROL_C = {ogrenci:'#7aa0ff',mezun:'var(--moss2)',meslektas:'#a78bfa',anonim:'#6e84a3'};
+var CAT_LBL = {ders:'Ders anlatımı',ulasim:'Ulaşılabilirlik',guncel:'Güncel içerik',adalet:'Sınav adaleti'};
+
+function hesaplaPuan(yorumlar) {
+  if(!yorumlar||!yorumlar.length) return null;
+  var tW=0,tG=0,cT={ders:0,ulasim:0,guncel:0,adalet:0},cC={ders:0,ulasim:0,guncel:0,adalet:0};
+  yorumlar.forEach(function(y){
+    var w=ROL_W[y.rol]||1;
+    tG+=y.genel*w; tW+=w;
+    var cats=y.cats||{};
+    Object.keys(cT).forEach(function(k){if(cats[k]){cT[k]+=cats[k]*w;cC[k]+=w;}});
+  });
+  var gen=tW>0?tG/tW:0;
+  var cats={};
+  Object.keys(cT).forEach(function(k){cats[k]=cC[k]>0?Math.round(cT[k]/cC[k]*10)/10:null;});
+  return{genel:Math.round(gen*10)/10,ogretim:Math.round(gen/5*20),cats:cats,count:yorumlar.length};
+}
+
+/* ══ BADGE ══ */
+function updateBadge() {
+  getAllYorumlar('bekleyen', function(d){
+    var badge=document.getElementById('admin-badge');
+    if(badge){badge.textContent=d.length;badge.style.display=d.length>0?'inline':'none';}
+  });
+}
+
+/* ══ SAYFA GEÇİŞİ ══ */
+var TID=null, SEL_ROL='ogrenci', GENEL_STAR=0;
+var CAT_STARS={ders:0,ulasim:0,guncel:0,adalet:0};
+var BASAMAK=['Arş. Gör.','Arş. Gör. Dr.','Öğr. Gör.','Öğr. Gör. Dr.','Dr. Öğr. Üyesi','Doç. Dr.','Prof. Dr.'];
+var DIMTR={Arastirma:'Araştırma Etkisi',Yayin:'Yayın Kalitesi',Ogretim:'Öğretim Kalitesi',Uluslararasi:'Uluslararasılık',Fon:'Proje ve Fon',Etik:'Etik Bütünlük'};
+var GRC={Mukemmel:'var(--moss2)',Iyi:'var(--ink)',Orta:'var(--warn)',Yetersiz:'var(--warn)',Kritik:'var(--danger)'};
+var GRTR={Mukemmel:'Mükemmel ✦',Iyi:'İyi',Orta:'Orta',Yetersiz:'Yetersiz',Kritik:'Kritik !'};
+
+function goPage(id,btn) {
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  if(id==='yorum') initHocaSelect();
+  if(id==='admin' && document.getElementById('admin-panel').classList.contains('on')) renderAdmin();
+}
+function goToYorum() {
+  var isim=document.getElementById('risim').textContent;
+  goPage('yorum', document.querySelectorAll('.ntab')[1]);
+  if(!isim) return;
+  // Supabase'den eşleşen hocayı bul
+  getHocalar(function(list){
+    var h=list.find(function(h){return h.isim.toLowerCase().trim()===isim.toLowerCase().trim();});
+    if(h){document.getElementById('sel-hoca').value=h.id;loadProfil();}
+  });
+}
+
+/* ══ HOCA SELECT ══ */
+function initHocaSelect() {
+  var sel=document.getElementById('sel-hoca');
+  sel.innerHTML='<option value="">— Yükleniyor… —</option>';
+  getHocalar(function(list){
+    sel.innerHTML='<option value="">— Seçiniz —</option>';
+    list.forEach(function(h){
+      var o=document.createElement('option');
+      o.value=h.id; o.textContent=h.isim+' — '+h.uni;
+      sel.appendChild(o);
+    });
+  });
+}
+
+function hocaEkle() {
+  var isim=document.getElementById('yeni-isim').value.trim();
+  var uni=document.getElementById('yeni-uni').value.trim();
+  if(!isim||!uni){showErr('y-err','Ad ve üniversite zorunlu.');return;}
+
+  insertHoca(isim, uni, function(h, err){
+    if(err){showErr('y-err','Eklenemedi: '+err);return;}
+    document.getElementById('yeni-isim').value='';
+    document.getElementById('yeni-uni').value='';
+    initHocaSelect();
+    setTimeout(function(){
+      document.getElementById('sel-hoca').value=h.id;
+      loadProfil();
+    },300);
+  });
+}
+
+function loadProfil() {
+  var hocaId=document.getElementById('sel-hoca').value;
+  var el=document.getElementById('profil-alani');
+  if(!hocaId){el.style.display='none';return;}
+  var sel=document.getElementById('sel-hoca');
+  var opt=sel.options[sel.selectedIndex];
+  var parts=(opt.textContent||'').split(' — ');
+  var isim=parts[0]||'';
+  var uni=parts[1]||'';
+  var pts=isim.trim().split(' ');
+  var ini=pts.length>=2?pts[0][0]+pts[pts.length-1][0]:isim.slice(0,2);
+  document.getElementById('ph-av').textContent=ini.toUpperCase();
+  document.getElementById('ph-isim').textContent=isim;
+  document.getElementById('ph-sub').textContent=uni;
+  el.style.display='block';
+  document.getElementById('yorum-liste').innerHTML='<div class="loading"><span aria-hidden="true" class="spin">&#x25CC;</span></i>Yorumlar yükleniyor…</div>';
+  document.getElementById('ph-score').innerHTML='<div class="loading" style="padding:.5rem"><span aria-hidden="true" class="spin">&#x25CC;</span></i></div>';
+  getYorumlar(hocaId,'onaylandi',function(list){
+    renderProfilScore(list);
+    renderYorumlar(list);
+  });
+  initCatStars();
+}
+
+function renderProfilScore(list) {
+  var puan=hesaplaPuan(list);
+  var sr=document.getElementById('ph-score');
+  if(puan){
+    var gc2=puan.genel>=4?'var(--grn)':puan.genel>=3?'var(--gold)':'var(--red)';
+    var topOrtStr=puan.genel.toFixed(1)+'/5';
+    // Yıldız gösterimi
+    var stars='';
+    for(var i=1;i<=5;i++) stars+='<span style="color:'+(i<=Math.round(puan.genel)?'var(--gold)':'var(--t3)')+'">★</span>';
+    sr.innerHTML=
+      '<div style="width:100%;margin-bottom:.75rem">'+
+        '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">'+
+          '<span style="font-size:1.6rem;font-weight:800;color:'+gc2+'">'+topOrtStr+'</span>'+
+          '<span style="font-size:1.1rem;letter-spacing:2px">'+stars+'</span>'+
+          '<span style="font-size:12px;color:var(--t3);margin-left:4px">'+puan.count+' onaylı yorum</span>'+
+        '</div>'+
+        // Genel puan bar
+        '<div style="height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:.75rem">'+
+          '<div style="width:'+Math.round(puan.genel/5*100)+'%;height:100%;background:'+gc2+';border-radius:3px"></div>'+
+        '</div>'+
+      '</div>'+
+      // Kategori pill'leri
+      '<div style="display:flex;flex-wrap:wrap;gap:.5rem">'+
+        pill(puan.ogretim+'/20','Öğretim Skoru','var(--blue2)')+
+        (puan.cats?Object.keys(puan.cats).filter(function(k){return puan.cats[k];}).map(function(k){
+          var v=puan.cats[k];
+          var cc=v>=4?'var(--grn)':v>=3?'var(--gold)':'var(--red)';
+          return pill(v.toFixed(1)+'/5',CAT_LBL[k],cc);
+        }).join(''):'')+
+      '</div>';
+  }else{
+    sr.innerHTML='<div style="font-size:13px;color:var(--t3);padding:.4rem 0">Henüz onaylı değerlendirme yok. İlk değerlendirmeyi siz yapın.</div>';
+  }
+}
+
+function pill(v,l,c){return'<div class="score-pill"><div class="sp-val" style="color:'+c+'">'+v+'</div><div class="sp-lbl">'+l+'</div></div>';}
+
+function renderYorumlar(list) {
+  var el=document.getElementById('yorum-liste');
+  if(!list.length){el.innerHTML='<div class="empty">Henüz onaylanmış değerlendirme yok.</div>';return;}
+  el.innerHTML=list.map(function(y){
+    var stars='';for(var i=1;i<=5;i++)stars+=i<=y.genel?'★':'☆';
+    var cats=y.cats||{};
+    var catH=Object.keys(cats).filter(function(k){return cats[k]>0;}).map(function(k){return'<span class="yi-cat">'+CAT_LBL[k]+': '+cats[k]+'</span>';}).join('');
+    return'<div class="yorum-item"><div class="yi-head"><div class="yi-meta"><span class="yi-rol" style="background:'+ROL_BG[y.rol]+';color:'+ROL_C[y.rol]+'">'+ROL_LBL[y.rol]+'</span><span class="yi-stars">'+stars+'</span>'+(y.donem?'<span style="font-size:11px;color:var(--t3)">'+y.donem+'</span>':'')+' </div><span class="yi-date">'+y.tarih+'</span></div>'+(catH?'<div class="yi-cats">'+catH+'</div>':'')+'<div class="yi-text">'+escH(y.metin||y.text||'')+'</div></div>';
+  }).join('');
+}
+
+/* ══ YORUM GÖNDER ══ */
+function secRol(el){document.querySelectorAll('.rol-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');SEL_ROL=el.dataset.rol;}
+function starTik(v){GENEL_STAR=v;document.querySelectorAll('#genel-stars .star').forEach(function(s,i){s.classList.toggle('on',i<v);});}
+function initCatStars(){
+  Object.keys(CAT_STARS).forEach(function(k){CAT_STARS[k]=0;});
+  document.querySelectorAll('.cat-stars').forEach(function(cont){
+    var cat=cont.dataset.cat;cont.innerHTML='';
+    [1,2,3,4,5].forEach(function(i){
+      var s=document.createElement('span');s.className='cat-star';s.textContent='★';
+      s.onclick=(function(c,v){return function(){CAT_STARS[c]=v;document.querySelectorAll('.cat-stars[data-cat="'+c+'"] .cat-star').forEach(function(st,j){st.classList.toggle('on',j<v);});}})(cat,i);
+      cont.appendChild(s);
+    });
+  });
+}
+
+function yorumGonder(){
+  var hocaId=document.getElementById('sel-hoca').value;
+  var text=document.getElementById('yorum-text').value.trim();
+  if(!hocaId){showErr('y-err','Lütfen akademisyen seçin.');return;}
+  if(!GENEL_STAR){showErr('y-err','Lütfen genel puan verin.');return;}
+  if(text.length<20){showErr('y-err','En az 20 karakter yazın.');return;}
+
+  showErr('y-err','');
+  var btn=document.querySelector('#pg-yorum .sbtn');
+  if(btn) btn.disabled=true;
+  var y={
+    id:'y_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    hocaId:hocaId,rol:SEL_ROL,genel:GENEL_STAR,
+    cats:Object.assign({},CAT_STARS),text:text,
+    donem:document.getElementById('donem').value.trim(),
+    tarih:new Date().toLocaleDateString('tr-TR'),
+    agirlik:ROL_W[SEL_ROL]
+  };
+  insertYorum(y,function(d,err){
+    if(btn) btn.disabled=false;
+    if(err){showErr('y-err','Gönderilemedi: '+err);return;}
+    // Reset form
+    GENEL_STAR=0;
+    document.querySelectorAll('#genel-stars .star').forEach(function(s){s.classList.remove('on');});
+    document.getElementById('yorum-text').value='';
+    document.getElementById('donem').value='';
+    initCatStars();
+    var t=document.getElementById('toast');t.classList.add('on');setTimeout(function(){t.classList.remove('on');},4000);
+    updateBadge();
+    // Mail
+    if(EJS_PUBLIC_KEY!=='BURAYA_EJS_PUBLIC_KEY'){
+      emailjs.init({publicKey:EJS_PUBLIC_KEY});
+      var sel=document.getElementById('sel-hoca');
+      var hIsim=sel.options[sel.selectedIndex].textContent.split(' — ')[0];
+      emailjs.send(EJS_SERVICE_ID,EJS_ADMIN_TPL,{
+        to_email:ADMIN_EMAIL,hoca_isim:hIsim,
+        yorum_rol:ROL_LBL[SEL_ROL],yorum_puan:y.genel+'/5',
+        yorum_metin:text.slice(0,300),tarih:y.tarih
+      }).catch(function(){});
+    }
+  });
+}
+
+/* ══ ADMİN ══ */
+function adminLogin(){
+  if(document.getElementById('admin-pw').value!==ADMIN_PW){
+    document.getElementById('login-err').style.display='block';return;
+  }
+  document.getElementById('admin-login').style.display='none';
+  document.getElementById('admin-panel').classList.add('on');
+  renderAdmin();
+}
+function adminLogout(){
+  document.getElementById('admin-panel').classList.remove('on');
+  document.getElementById('admin-login').style.display='block';
+  document.getElementById('admin-pw').value='';
+}
+
+function renderAdmin(){
+
+  document.getElementById('kuyruk-liste').innerHTML='<div class="loading"><span aria-hidden="true" class="spin">&#x25CC;</span></i>Yükleniyor…</div>';
+  // Hocaları da çek (isim gösterimi için)
+  getHocalar(function(hocalar){
+    function hIsim(id){var h=hocalar.find(function(h){return h.id===id;});return h?h.isim:id;}
+    // Bekleyen
+    getAllYorumlar('bekleyen',function(bek){
+      document.getElementById('stat-b').textContent=bek.length;
+      var kEl=document.getElementById('kuyruk-liste');
+      if(!bek.length){kEl.innerHTML='<div class="empty">Bekleyen yorum yok. ✓</div>';}
+      else{
+        kEl.innerHTML=bek.map(function(y){return qItem(y,hIsim,true);}).join('');
+        kEl.onclick=function(ev){
+          var btn=ev.target.closest('button[data-id]');
+          if(btn) karar(btn.dataset.id,btn.dataset.d);
+        };
+      }
+    });
+    // Onaylanan
+    getAllYorumlar('onaylandi',function(ona){
+      document.getElementById('stat-o').textContent=ona.length;
+      var oEl=document.getElementById('onaylanan-liste');
+      if(!ona.length){oEl.innerHTML='<div class="empty">Henüz onaylanan yorum yok.</div>';}
+      else{
+        oEl.innerHTML=ona.map(function(y){return qItem(y,hIsim,false);}).join('');
+        oEl.onclick=function(ev){
+          var btn=ev.target.closest('button[data-id]');
+          if(btn) karar(btn.dataset.id,btn.dataset.d);
+        };
+      }
+    });
+    // Reddedilen sayısı
+    getAllYorumlar('reddedildi',function(red){
+      document.getElementById('stat-r').textContent=red.length;
+    });
+  });
+}
+
+function qItem(y,hIsim,isBekleyen){
+  var stars='';for(var i=1;i<=5;i++)stars+=i<=y.genel?'★':'☆';
+  var cats=y.cats||{};
+  var catH=Object.keys(cats).filter(function(k){return cats[k]>0;}).map(function(k){return'<span class="yi-cat">'+CAT_LBL[k]+': '+cats[k]+'</span>';}).join('');
+  var acts=isBekleyen
+    ?'<div class="qi-actions"><button class="btn-ok" data-id="'+y.id+'" data-d="onaylandi"><span aria-hidden="true">&#x2713;</span></i>Onayla</button><button class="btn-red" data-id="'+y.id+'" data-d="reddedildi"><span aria-hidden="true">&#x00D7;</span></i>Reddet</button></div>'
+    :'<div class="qi-actions"><button class="btn-red" data-id="'+y.id+'" data-d="reddedildi"><span aria-hidden="true">&#x21A9;</span></i>Geri Al</button></div>';
+  return'<div class="queue-item"><div class="qi-hoca">'+hIsim(y.hoca_id||y.hocaId)+'</div><div class="qi-meta"><span class="yi-rol" style="background:'+ROL_BG[y.rol]+';color:'+ROL_C[y.rol]+'">'+ROL_LBL[y.rol]+'</span><span>'+stars+'</span><span>'+y.tarih+'</span><span>'+y.agirlik+'×</span></div>'+(catH?'<div class="qi-cats">'+catH+'</div>':'')+'<div class="qi-text">'+escH(y.metin||y.text||'')+'</div>'+acts+'</div>';
+}
+
+function karar(id, durum){
+  updateYorumDurum(id, durum, function(){
+    renderAdmin();
+    updateBadge();
+    // Yorum sayfası: hoca seçiliyse puanı ve listeyi güncelle
+    var hocaId=document.getElementById('sel-hoca').value;
+    if(hocaId){
+      getYorumlar(hocaId,'onaylandi',function(list){
+        renderProfilScore(list);
+        renderYorumlar(list);
+      });
+    }
+  });
+}
+
+/* ══ ANALİZ ══ */
+function baslat(){
+  var isim=document.getElementById('fi').value.trim();
+  var uni=document.getElementById('funi').value;
+  var bol=document.getElementById('fbol').value;
+  var unv=document.getElementById('fu').value;
+  if(!isim){showErr('a-err','Lütfen akademisyen adı soyadı girin.');return;}
+  if(!uni){showErr('a-err','Lütfen üniversite seçin.');return;}
+  showErr('a-err','');
+  document.getElementById('sbtn').disabled=true;
+  document.getElementById('res').classList.remove('on');
+  document.getElementById('datapanel').classList.remove('on');
+  document.getElementById('prog').classList.add('on');
+  resetSteps();
+  var secs=0;
+  TID=setInterval(function(){secs++;document.getElementById('timerTxt').textContent='('+secs+'s)';},1000);
+  stepSet('s1','act');setPtxt('OpenAlex\'te yazar aranıyor…');
+  searchOpenAlex(isim,uni,function(author){
+    stepSet('s1',author?'ok':'err');
+    stepSet('s2','act');setPtxt('Yayın verileri çekiliyor…');
+    if(author&&author.id){
+      fetchWorks(author.id,function(works){
+        stepSet('s2','ok');
+        continueAnalysis(author,works,isim,uni,bol,unv);
+      });
+    }else{
+      stepSet('s2','err');
+      continueAnalysis(null,[],isim,uni,bol,unv);
+    }
+  });
+}
+
+function searchOpenAlex(name,uni,cb){
+  var q=encodeURIComponent(name);
+  fetch('https://api.openalex.org/authors?search='+q+'&filter=affiliations.institution.country_code:TR&per_page=5&select=id,display_name,works_count,cited_by_count,summary_stats,affiliations,topics,counts_by_year&mailto=akademiskoru@example.com')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var results=d.results||[];
+      var best=null;
+      var uniLow=uni.toLowerCase().replace('üniversitesi','').trim().slice(0,6);
+      for(var i=0;i<results.length;i++){
+        var affs=results[i].affiliations||[];
+        for(var j=0;j<affs.length;j++){
+          if((affs[j].institution&&affs[j].institution.display_name||'').toLowerCase().indexOf(uniLow)>-1){best=results[i];break;}
+        }
+        if(best) break;
+      }
+      if(!best&&results.length>0) best=results[0];
+      cb(best);
+    }).catch(function(){cb(null);});
+}
+
+function fetchWorks(aid,cb){
+  fetch('https://api.openalex.org/works?filter=author.id:'+aid+'&per_page=50&sort=cited_by_count:desc&select=id,title,publication_year,cited_by_count,authorships,primary_location,is_retracted&mailto=akademiskoru@example.com')
+    .then(function(r){return r.json();})
+    .then(function(d){cb(d.results||[]);}).catch(function(){cb([]);});
+}
+
+function continueAnalysis(author,works,isim,uni,bol,unv){
+  stepSet('s3','act');setPtxt('Veriler işleniyor…');
+  var d=processRaw(author,works,isim);
+  showDataPanel(d);
+  stepSet('s3','ok');
+  stepSet('s4','act');setPtxt('AI analizi başlıyor…');
+  // Analiz edilen hocayı Supabase'e ekle
+  if(SB_READY){
+    upsertHoca(d.name||isim, uni, function(h){
+      if(h&&h.id){
+        getYorumlar(h.id,'onaylandi',function(yorumlar){
+          var cp=hesaplaPuan(yorumlar);
+          var ctx=buildCtx(d,isim,uni,bol,unv,cp);
+          apiCall([{role:'user',content:ctx}],function(data,err){multiTurn(data,err,ctx,0,isim,uni,unv);});
+        });
+      }else{
+        var ctx=buildCtx(d,isim,uni,bol,unv,null);
+        apiCall([{role:'user',content:ctx}],function(data,err){multiTurn(data,err,ctx,0,isim,uni,unv);});
+      }
+    });
+  }else{
+    var ctx=buildCtx(d,isim,uni,bol,unv,null);
+    apiCall([{role:'user',content:ctx}],function(data,err){multiTurn(data,err,ctx,0,isim,uni,unv);});
+  }
+}
+
+function processRaw(author,works,name){
+  if(!author)return{found:false,name:name,works_count:0,cited_by_count:0,h_index:0,i10_index:0,recent_works:0,intl_collab_pct:0,retracted:0,top_cited:0,topics:[]};
+  var ss=author.summary_stats||{};
+  var now=new Date().getFullYear();
+  var recent=0;(author.counts_by_year||[]).forEach(function(y){if(y.year>=now-3)recent+=(y.works_count||0);});
+  var intl=0;
+  works.forEach(function(w){
+    var hasTR=false,hasI=false;
+    (w.authorships||[]).forEach(function(a){(a.institutions||[]).forEach(function(inst){if(inst.country_code==='TR')hasTR=true;else hasI=true;});});
+    if(hasTR&&hasI)intl++;
+  });
+  return{found:true,openalex_id:author.id,name:author.display_name||name,works_count:author.works_count||0,cited_by_count:author.cited_by_count||0,h_index:ss.h_index||0,i10_index:ss.i10_index||0,recent_works:recent,intl_collab_pct:works.length>0?Math.round(intl/works.length*100):0,retracted:works.filter(function(w){return w.is_retracted;}).length,top_cited:works.length>0?(works[0].cited_by_count||0):0,topics:(author.topics||[]).slice(0,3).map(function(t){return t.display_name||'';})};
+}
+
+function showDataPanel(d){
+  function stat(l,v,s,c){return'<div class="dstat"><div class="dstat-lbl">'+l+'</div><div class="dstat-val" style="color:'+(c||'var(--t)')+'">'+v+'</div>'+(s?'<div class="dstat-sub">'+s+'</div>':'')+'</div>';}
+  document.getElementById('dpSrc').innerHTML=d.found?'<span class="src-badge api"><span aria-hidden="true" style="font-size:10px">&#x2713;</span></i> OpenAlex</span>':'<span class="src-badge none">Bulunamadı</span>';
+  if(d.found){
+    document.getElementById('dpgrid').innerHTML=stat('H-indeksi',d.h_index,'',d.h_index>=10?'var(--grn)':d.h_index>=5?'var(--gold)':'var(--red)')+stat('Toplam atıf',d.cited_by_count.toLocaleString('tr'),'')+stat('Toplam yayın',d.works_count,'')+stat('i10-indeks',d.i10_index,'10+ atıf alan');
+    document.getElementById('dpgrid2').innerHTML=stat('Son 3 yıl',d.recent_works,'yayın',d.recent_works>=3?'var(--grn)':d.recent_works>=1?'var(--gold)':'var(--red)')+stat('Uluslararası','%'+d.intl_collab_pct,'ortak yazar',d.intl_collab_pct>=20?'var(--grn)':d.intl_collab_pct>=5?'var(--gold)':'var(--red)')+stat('Geri çekilen',d.retracted,d.retracted>0?'⚠️ risk':'temiz',d.retracted>0?'var(--red)':'var(--grn)');
+  }else{
+    document.getElementById('dpgrid').innerHTML=stat('Durum','Bulunamadı','','var(--t3)')+stat('H-indeksi','?','tahminli')+stat('Atıf','?','')+stat('Yayın','?','');
+    document.getElementById('dpgrid2').innerHTML=stat('Son 3 yıl','?','')+stat('Uluslararası','%?','')+stat('Geri çekilen','?','');
+  }
+  document.getElementById('datapanel').classList.add('on');
+}
+
+function buildCtx(d,isim,uni,bol,unv,cp){
+  var s='Asagidaki GERCEK verilerle degerlendir:\nKIMIK: '+isim+' | '+uni+(bol?' | '+bol:'')+' | Unvan: '+unv+'\nOPENALEX: '+(d.found?'Bulundu':'Bulunamadi')+'\n';
+  if(d.found)s+='H:'+d.h_index+' Atif:'+d.cited_by_count+' Yayin:'+d.works_count+' i10:'+d.i10_index+' Son3yil:'+d.recent_works+' Intl:%'+d.intl_collab_pct+' GeriCekilen:'+d.retracted+'\n';
+  if(cp)s+='TOPLULUK: Genel:'+cp.genel+'/5 ('+cp.count+' yorum) Ogretim:'+cp.ogretim+'/20\n';
+  return s;
+}
+
+var SYS='Sen Turk akademisini analitik degerlendiren bir uzmansın. GERCEK OpenAlex verilerini ve topluluk degerlendirmelerini temel al.\n\nYanitini 2 bolumde ver:\nBOLUM 1: Tek satir JSON:\n{"isim":"Ad Soyad","univan":"Universite Bolum","initials":"AK","toplam_puan":55,"grade":"Orta","etiketler":[{"text":"etiket","tip":"green"}],"boyutlar":[{"isim":"Arastirma","puan":15,"max":30,"renk":"#4f7cff"},{"isim":"Yayin","puan":10,"max":20,"renk":"#f0a500"},{"isim":"Ogretim","puan":12,"max":20,"renk":"#22c97a"},{"isim":"Uluslararasi","puan":8,"max":15,"renk":"#a78bfa"},{"isim":"Fon","puan":6,"max":10,"renk":"#f97316"},{"isim":"Etik","puan":4,"max":5,"renk":"#e84444"}],"bulgular":[{"tip":"orange","ikon":"⚠️","baslik":"Baslik","aciklama":"aciklama"}],"uyum":{"puan":62,"renk":"orange","mesaj":"Kismi uyum","detay":["guclu","zayif"]},"sonraki":{"unvan":"Prof. Dr.","yakinlik":28,"sure":"2-3 yil","eksik":["Q1 dergi","uluslararasi isbirligi"]}}\nJSON: string degerler ASCII, sayilar integer, uyum.puan<40 ise "oneri_unvan":"alt unvan" ekle\nBOLUM 2: JSON sonrasi bos satir, Turkce serbest analiz.';
+
+function multiTurn(d,e,msg,tur,isim,uni,unv){
+  if(e){finishErr(e);return;}
+  if(d.stop_reason!=='tool_use'||tur>=6){
+    stepSet('s4','ok');stepSet('s5','act');setPtxt('Rapor oluşturuluyor…');
+    var txt='';(d.content||[]).forEach(function(b){if(b.type==='text')txt+=b.text+'\n';});
+    var parsed=parseJ(txt);
+    if(!parsed){finishErr('Sonuç işlenemedi. Lütfen tekrar deneyin.');return;}
+    var jEnd=txt.lastIndexOf('}');
+    parsed.analiz=jEnd>-1?txt.slice(jEnd+1).trim():'Detaylı analiz için bulgulara bakın.';
+    stepSet('s5','ok');
+    finishOk(parsed,isim,uni,unv);return;
+  }
+  tur++;
+  var uses=(d.content||[]).filter(function(b){return b.type==='tool_use';});
+  var res=uses.map(function(b){return{type:'tool_result',tool_use_id:b.id,content:''};});
+  if(tur===1)setPtxt('Web araması yapılıyor…');
+  apiCall([{role:'user',content:msg},{role:'assistant',content:d.content},{role:'user',content:res}],function(d2,e2){multiTurn(d2,e2,msg,tur,isim,uni,unv);});
+}
+
+function apiCall(msgs,cb){
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:SYS,tools:[{type:'web_search_20250305',name:'web_search'}],messages:msgs})
+  }).then(function(r){
+    if(!r.ok)return r.text().then(function(t){var m='API hatası: '+r.status;try{m=JSON.parse(t).error.message;}catch(x){}cb(null,m);});
+    return r.json().then(function(d){cb(d,null);});
+  }).catch(function(e){cb(null,'Bağlantı hatası: '+e.message);});
+}
+
+function finishErr(msg){clearInterval(TID);document.getElementById('prog').classList.remove('on');document.getElementById('sbtn').disabled=false;showErr('a-err',msg);}
+
+function finishOk(r,isim,uni,unv){
+  clearInterval(TID);
+  document.getElementById('prog').classList.remove('on');
+  document.getElementById('sbtn').disabled=false;
+  render(r,isim,uni,unv);
+  updateBadge();
+}
+
+function render(r,fbI,fbU,unv){
+  document.getElementById('rav').textContent=(r.initials||fbI.slice(0,2)).toUpperCase();
+  document.getElementById('risim').textContent=r.isim||fbI;
+  document.getElementById('rsub').textContent=(r.univan||fbU)+' · '+unv;
+  document.getElementById('rtags').innerHTML=(r.etiketler||[]).map(function(t){return'<span class="tag '+(t.tip||'')+'">'+t.text+'</span>';}).join('');
+  var gc=GRC[r.grade]||'var(--warn)';
+  var pe=document.getElementById('rpuan');pe.textContent=r.toplam_puan!=null?r.toplam_puan:'—';pe.style.color=gc;
+  var ge=document.getElementById('rgr');ge.textContent=GRTR[r.grade]||r.grade;ge.style.color=gc;
+  document.getElementById('rdims').innerHTML=(r.boyutlar||[]).map(function(d){
+    var p=Math.round(d.puan/d.max*100),n=DIMTR[d.isim]||d.isim;
+    return'<div class="dimrow"><div class="dname">'+n+'</div><div class="dtrack"><div class="dfill" style="width:'+p+'%;background:var(--ink)"></div></div><div class="dval" style="color:'+d.renk+'">'+d.puan+'<span style="color:var(--t3);font-weight:400">/'+d.max+'</span></div></div>';
+  }).join('');
+  var uu=r.uyum||{},su=r.sonraki||{};
+  var up=typeof uu.puan==='number'?uu.puan:50;
+  var uc=up>=70?'var(--moss2)':up<40?'var(--danger)':'var(--warn)';
+  var ubg=up>=70?'rgba(34,201,122,.06)':up<40?'rgba(232,68,68,.06)':'rgba(240,165,0,.06)';
+  var ubr=up>=70?'rgba(34,201,122,.18)':up<40?'rgba(232,68,68,.18)':'rgba(240,165,0,.18)';
+  var ci=BASAMAK.indexOf(unv);
+  var k1='<div class="ucard" style="border-color:'+ubr+';background:'+ubg+'"><div class="uclbl">📋 Mevcut unvan yeterliliği — '+unv+'</div><div class="ucval"><span class="big" style="color:'+uc+'">'+up+'</span><span class="suf">/ 100</span></div><div class="ubar"><div class="ubar-f" style="width:'+up+'%;background:'+uc+'"></div></div><div class="ucmsg">'+(uu.mesaj||'');
+  var ud=uu.detay||[];if(ud.length){k1+='<div class="ucexik" style="margin-top:.4rem">';ud.forEach(function(d){k1+='<span>'+d+'</span>';});k1+='</div>';}
+  k1+='</div>';if(up<40){var ou=r.oneri_unvan||(ci>0?BASAMAK[ci-1]:unv);k1+='<div class="badge-down">⬇ Önerilen unvan: <strong style="margin-left:4px">'+ou+'</strong></div>';}k1+='</div>';
+  var yp=typeof su.yakinlik==='number'?su.yakinlik:0,yc=yp>=70?'var(--moss2)':yp>=40?'var(--ink)':'var(--warn)';
+  var snxt=su.unvan||(ci>=0&&ci<BASAMAK.length-1?BASAMAK[ci+1]:'En yüksek unvan');
+  var eks=(su.eksik||[]).slice(0,3);
+  var k2='<div class="ucard"><div class="uclbl">🎯 Bir sonraki unvana uzaklık — '+snxt+'</div><div class="ucval"><span class="big" style="color:'+yc+'">'+yp+'</span><span class="suf">/ 100 hazır</span></div><div class="ubar"><div class="ubar-f" style="width:'+yp+'%;background:'+yc+'"></div></div><div class="ucmsg">'+(su.sure?'<b>Tahmini süre: '+su.sure+'</b>':'');
+  if(eks.length){k2+='<div class="ucexik" style="margin-top:.4rem">';eks.forEach(function(e){k2+='<span>'+e+'</span>';});k2+='</div>';}else k2+=' Kriterler karşılanıyor.';
+  k2+='</div></div>';
+  document.getElementById('rucards').innerHTML=k1+k2;
+  document.getElementById('rbulg').innerHTML=(r.bulgular||[]).length?(r.bulgular||[]).map(function(b){return'<div class="bulg '+(b.tip||'accent')+'"><div class="bicon">'+(b.ikon||'📋')+'</div><div class="bbody"><b>'+(b.baslik||'')+'</b>'+(b.aciklama||'')+'</div></div>';}).join(''):'<div class="empty">Belirgin bulgu tespit edilmedi.</div>';
+  document.getElementById('ranaliz').textContent=r.analiz||'';
+  document.getElementById('res').classList.add('on');
+  document.getElementById('res').scrollIntoView({behavior:'smooth'});
+}
+
+/* ══ UTILS ══ */
+function parseJ(txt){
+  txt=txt.replace(/```json\s*/gi,'').replace(/```/g,'');
+  var s=txt.indexOf('{'),e=txt.lastIndexOf('}');if(s<0||e<0)return null;
+  var js=txt.slice(s,e+1);
+  try{return JSON.parse(js);}catch(err){
+    try{return{isim:sf(js,'isim')||'',univan:sf(js,'univan')||'',initials:sf(js,'initials')||'??',grade:sf(js,'grade')||'Orta',toplam_puan:nf(js,'toplam_puan')||50,etiketler:af(js,'etiketler'),boyutlar:af(js,'boyutlar'),bulgular:af(js,'bulgular'),uyum:of(js,'uyum'),sonraki:of(js,'sonraki'),oneri_unvan:sf(js,'oneri_unvan')||null};}catch(e2){return null;}
+  }
+}
+function sf(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*"([^"]*)"'));return m?m[1]:null;}
+function nf(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*(\\d+)'));return m?parseInt(m[1]):null;}
+function af(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*(\\[[\\s\\S]*?\\])(?=[,}])'));if(!m)return[];try{return JSON.parse(m[1]);}catch(e){return[];}}
+function of(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*(\\{[^}]*\\})'));if(!m)return{};try{return JSON.parse(m[1]);}catch(e){return{};}}
+function showErr(id,m){var b=document.getElementById(id);if(!b)return;b.textContent=m;b.style.display=m?'block':'none';}
+function setPtxt(t){document.getElementById('ptxt').textContent=t;}
+function stepSet(id,st){var e=document.getElementById(id);e.className='step'+(st?' '+st:'');var ic=e.querySelector('.sic');if(st==='act')ic.innerHTML='<span aria-hidden="true" class="spin">&#x25CC;</span></i>';else if(st==='ok')ic.innerHTML='✓';else if(st==='err')ic.innerHTML='✕';else ic.innerHTML='';}
+function resetSteps(){['s1','s2','s3','s4','s5'].forEach(function(id){stepSet(id,'');});}
+function escH(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+updateBadge();
+
+/* ══ TANITIM DEMO ══ */
+(function(){
+  var cur=0,total=4,autoT=null,AUTO_MS=3500;
+
+  function renderDots(){
+    var el=document.getElementById('d-dots');
+    if(!el)return;
+    el.innerHTML='';
+    for(var i=0;i<total;i++){
+      var d=document.createElement('div');
+      d.className='d-dot'+(i===cur?' on':'');
+      (function(n){d.onclick=function(){goStep(n);};})(i);
+      el.appendChild(d);
+    }
+    var prog=document.getElementById('d-progress');
+    if(prog) prog.textContent=(cur+1)+' / '+total;
+  }
+
+  function renderStep(){
+    for(var i=0;i<total;i++){
+      var p=document.getElementById('dp'+i);
+      var btn=document.querySelector('.step-btn[data-step="'+i+'"]');
+      if(p) p.classList.toggle('on',i===cur);
+      if(btn) btn.classList.toggle('on',i===cur);
+    }
+    renderDots();
+
+    if(cur===0){
+      var tw=document.getElementById('tw-demo');
+      if(tw){
+        tw.textContent='';
+        var txt='Prof. Dr. Kuzey Orhan Kus';
+        var idx=0;
+        var ti=setInterval(function(){
+          if(idx<txt.length){tw.textContent+=txt[idx++];}
+          else clearInterval(ti);
+        },50);
+      }
+    }
+    if(cur===1){
+      setTimeout(function(){
+        document.querySelectorAll('#dp1 .demo-bar-fill').forEach(function(b){
+          var w=b.dataset.w; b.style.width='0%';
+          setTimeout(function(){b.style.width=w+'%';},60);
+        });
+      },50);
+    }
+    if(cur===2){
+      var ap2=document.getElementById('demo-ap2');
+      var lbl=document.getElementById('demo-ap2-lbl');
+      if(ap2) ap2.style.opacity='.5';
+      setTimeout(function(){
+        if(ap2){ap2.style.opacity='1';ap2.style.borderLeftColor='var(--moss2)';ap2.classList.remove('pending');}
+        if(lbl){lbl.style.color='var(--moss2)';lbl.textContent='✓ onaylandı';}
+      },1200);
+    }
+  }
+
+  function startAuto(){
+    stopAuto();
+    autoT=setInterval(function(){
+      cur=(cur+1)%total;
+      renderStep();
+    },AUTO_MS);
+  }
+  function stopAuto(){
+    if(autoT){clearInterval(autoT);autoT=null;}
+  }
+
+  window.goStep=function(n){cur=n;stopAuto();renderStep();startAuto();};
+  window.nextStep=function(){cur=(cur+1)%total;stopAuto();renderStep();startAuto();};
+  window.prevStep=function(){cur=(cur-1+total)%total;stopAuto();renderStep();startAuto();};
+
+  renderStep();
+  startAuto();
+})();
+
+</script>
+</body>
+</html>
