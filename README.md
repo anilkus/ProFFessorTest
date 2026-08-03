@@ -1,6 +1,7 @@
 # ProFFessorTest
 
 *Türk akademisinde gerçek ölçüt arayan bir platform.*
+Akademisyeni yalnızca yayın/proje kriterine göre değil, daha kapsamlı değerlendiren gerçekci bir platform !
 
 ---
 
