@@ -8,39 +8,40 @@
 <title>ProFFessorTest — Akademik Değerlendirme</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#14211b;--ink2:#4d5b54;--ink3:#7c8a83;--ink4:#b9c3be;
-  --paper:#ffffff;--paper2:#f4f7f5;--paper3:#e9efeb;--bg:#f4f7f5;
-  --line:#e3e9e5;--line2:#cfd8d3;
-  --moss:#16794d;--moss2:#1f9a62;--moss3:#e3f4ea;
+  --ink:#2f2c27;--ink2:#5b564d;--ink3:#857e72;--ink4:#b8af9f;
+  --paper:#fbf7ef;--paper2:#f3ede1;--paper3:#e8e0d0;--bg:#efe9dd;
+  --line:#e3dac9;--line2:#d0c5b1;
+  --moss:#2f7a52;--moss2:#3c9466;--moss3:#e1eedf;
   --danger:#c53b3b;--warn:#a26a00;--warn3:#fdf3dc;--danger3:#fbe9e9;
-  --shadow:0 1px 2px rgba(20,33,27,.05),0 6px 20px rgba(20,33,27,.06);
+  --shadow:0 1px 2px rgba(60,45,20,.05),0 6px 20px rgba(60,45,20,.07);
   --r:14px;--r-sm:10px;
   --on-moss:#fff;
-  --sans:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --sans:'Comic Relief','Comic Sans MS','Comic Sans','Chalkboard SE',system-ui,sans-serif;
   --serif:var(--sans);--mono:var(--sans)
 }
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) input,:root:not([data-theme="light"]) select,:root:not([data-theme="light"]) textarea{background:var(--paper2)}}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --ink:#e7eeea;--ink2:#a9b6af;--ink3:#7d8b84;--ink4:#4a5650;
-  --paper:#18201c;--paper2:#1f2924;--paper3:#26322c;--bg:#111714;
-  --line:#2a3530;--line2:#36433d;
+  --ink:#e6e1d6;--ink2:#b3ac9f;--ink3:#857e72;--ink4:#504a41;
+  --paper:#24211c;--paper2:#2c2822;--paper3:#363129;--bg:#1b1915;
+  --line:#38332b;--line2:#474036;
   --moss:#34b277;--moss2:#45c486;--moss3:#163526;
   --danger:#e06767;--warn:#e0a83e;--warn3:#3a2d10;--danger3:#3a1b1b;--on-moss:#08190f;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)
 }}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh}
 
 /* NAV */
 nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 2rem;position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .logo{display:flex;align-items:center;gap:10px}
-.lmark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--moss2),var(--moss));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800;flex-shrink:0}
-.lname{font-size:1.1rem;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+.lmark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--moss2),var(--moss));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:700;flex-shrink:0}
+.lname{font-size:1.1rem;font-weight:700;color:var(--ink);letter-spacing:-.3px}
 .ltag{font-size:12px;color:var(--ink3)}
 .nav-tabs{display:flex;gap:4px;background:var(--paper2);padding:4px;border-radius:999px;border:1px solid var(--line)}
 .ntab{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink2);background:none;border:none;cursor:pointer;padding:7px 16px;border-radius:999px;display:flex;align-items:center;gap:6px;transition:background .15s,color .15s}
@@ -57,7 +58,7 @@ nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;paddi
 /* HERO */
 .hero{text-align:center;padding:3.5rem 0 1.75rem}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--moss);background:var(--moss3);padding:5px 12px;border-radius:999px;margin-bottom:1.1rem}
-h1{font-size:clamp(2rem,5vw,2.9rem);font-weight:800;line-height:1.12;letter-spacing:-1px;color:var(--ink);margin-bottom:.9rem}
+h1{font-size:clamp(2rem,5vw,2.9rem);font-weight:700;line-height:1.12;letter-spacing:-1px;color:var(--ink);margin-bottom:.9rem}
 h1 em{font-style:normal;color:var(--moss)}
 .hero-desc{font-size:17px;color:var(--ink2);line-height:1.6;max-width:560px;margin:0 auto}
 
@@ -65,10 +66,10 @@ h1 em{font-style:normal;color:var(--moss)}
 .form-section,.datapanel,.res,.y-section,.admin-login,.how,.pbox{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
 .form-section{padding:1.75rem;margin-top:1.25rem}
 .section-no{font-size:13px;font-weight:700;color:var(--moss);margin-bottom:.35rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.section-title{font-size:1.35rem;font-weight:800;letter-spacing:-.3px;color:var(--ink);margin-bottom:1.1rem}
-label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+.section-title{font-size:1.35rem;font-weight:700;letter-spacing:-.3px;color:var(--ink);margin-bottom:1.1rem}
+label{display:block;font-size:15px;font-weight:700;color:var(--ink2);margin-bottom:6px}
 label::first-letter{text-transform:uppercase}
-input,select,textarea{width:100%;background:var(--paper);border:1.5px solid var(--line2);border-radius:var(--r-sm);color:var(--ink);padding:11px 14px;font-size:15px;font-family:var(--sans);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+input,select,textarea{width:100%;background:#fffdf8;border:1.5px solid var(--line2);border-radius:var(--r-sm);color:var(--ink);padding:11px 14px;font-size:15px;font-family:var(--sans);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
 select{background-image:linear-gradient(45deg,transparent 50%,var(--ink3) 50%),linear-gradient(135deg,var(--ink3) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
 input:focus,select:focus,textarea:focus{border-color:var(--moss2);box-shadow:0 0 0 4px var(--moss3)}
 input::placeholder,textarea::placeholder{color:var(--ink4)}
@@ -76,7 +77,13 @@ select option{background:var(--paper);color:var(--ink)}
 textarea{min-height:110px;resize:vertical;line-height:1.6}
 #fi{font-size:17px;padding:14px 16px;border-width:2px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-.form-note{font-size:13px;color:var(--ink3);margin-top:.5rem;line-height:1.55}
+.form-note{font-size:14px;color:var(--ink3);margin-top:.5rem;line-height:1.55}
+
+/* ADIM REHBERİ */
+.adimlar{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
+.adim{display:flex;align-items:center;gap:8px;background:var(--paper2);border-radius:999px;padding:6px 14px 6px 6px;font-size:15px;color:var(--ink2)}
+.adim b{width:26px;height:26px;border-radius:50%;background:var(--moss);color:var(--on-moss);display:flex;align-items:center;justify-content:center;font-size:14px}
+.opt{font-weight:400;color:var(--ink3);font-size:13.5px}
 
 /* BUTONLAR */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:1.5px solid var(--line2);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -117,7 +124,7 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 .dpgrid>div,.dpgrid2>div{background:var(--paper2);border-radius:var(--r-sm);padding:.9rem 1rem}
 .dstat-lbl{font-size:12.5px;font-weight:600;color:var(--ink3);margin-bottom:.25rem}
 .dstat-lbl::first-letter{text-transform:uppercase}
-.dstat-val{font-size:1.75rem;font-weight:800;line-height:1.1;color:var(--ink);letter-spacing:-.5px}
+.dstat-val{font-size:1.75rem;font-weight:700;line-height:1.1;color:var(--ink);letter-spacing:-.5px}
 .dstat-sub{font-size:12px;color:var(--ink3);margin-top:2px}
 .src-tag{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;background:var(--paper2);color:var(--ink3)}
 .src-tag.ok{background:var(--moss3);color:var(--moss)}
@@ -139,10 +146,10 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 .res{display:none;margin-top:1.25rem;overflow:hidden}.res.on{display:block}
 .prof-split{display:grid;grid-template-columns:150px 1fr;gap:1.75rem;padding:1.75rem}
 .prof-score{background:var(--paper2);border-radius:var(--r);padding:1.25rem .75rem;text-align:center;align-self:start}
-.score-big{font-size:3.6rem;font-weight:800;line-height:1;letter-spacing:-2px;color:var(--ink)}
+.score-big{font-size:3.6rem;font-weight:700;line-height:1;letter-spacing:-2px;color:var(--ink)}
 .score-max{font-size:13px;color:var(--ink3);margin-top:4px}
 .score-gr{display:inline-block;font-size:13px;font-weight:700;margin-top:.6rem;padding:3px 12px;border-radius:999px;background:var(--paper);text-transform:capitalize}
-.prof-name{font-size:1.5rem;font-weight:800;letter-spacing:-.3px;color:var(--ink);margin-bottom:2px}
+.prof-name{font-size:1.5rem;font-weight:700;letter-spacing:-.3px;color:var(--ink);margin-bottom:2px}
 .prof-sub{font-size:14px;color:var(--ink3);margin-bottom:.9rem}
 .tagrow{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.1rem}
 .tag{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--paper2);color:var(--ink2)}
@@ -160,7 +167,7 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 .ucard{background:var(--paper2);border-radius:var(--r);padding:1.25rem}
 .uclbl{font-size:13px;font-weight:600;color:var(--ink3);margin-bottom:.4rem}
 .uclbl::first-letter{text-transform:uppercase}
-.ucnum{font-size:2.4rem;font-weight:800;line-height:1;letter-spacing:-1px;color:var(--ink);margin-bottom:.3rem}
+.ucnum{font-size:2.4rem;font-weight:700;line-height:1;letter-spacing:-1px;color:var(--ink);margin-bottom:.3rem}
 .ucbar{height:8px;background:var(--paper3);border-radius:999px;margin:.6rem 0 .7rem;overflow:hidden}
 .ucfill{height:100%;border-radius:999px}
 .ucmsg{font-size:14px;color:var(--ink2);line-height:1.6}
@@ -171,7 +178,7 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 .bulg-wrap,.anal-wrap{padding:1.5rem 1.75rem;border-top:1px solid var(--line)}
 .bulg{display:flex;gap:12px;padding:.8rem 1rem;border-radius:var(--r-sm);background:var(--paper2);margin-top:.5rem}
 .bulg.green{background:var(--moss3)}.bulg.orange{background:var(--warn3)}.bulg.red{background:var(--danger3)}
-.bicon{font-size:14px;font-weight:800;flex-shrink:0;margin-top:1px;color:var(--ink3)}
+.bicon{font-size:14px;font-weight:700;flex-shrink:0;margin-top:1px;color:var(--ink3)}
 .bulg.green .bicon{color:var(--moss)}.bulg.orange .bicon{color:var(--warn)}.bulg.red .bicon{color:var(--danger)}
 .bbody{font-size:14px;color:var(--ink2);line-height:1.55}
 .bbody b{font-weight:700;color:var(--ink)}
@@ -183,18 +190,18 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 .how{padding:1.75rem;margin-top:2rem}
 .how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:.5rem}
 .how-item{background:var(--paper2);border-radius:var(--r);padding:1.1rem}
-.how-n{width:30px;height:30px;border-radius:9px;background:var(--moss3);color:var(--moss);font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:.7rem}
+.how-n{width:30px;height:30px;border-radius:9px;background:var(--moss3);color:var(--moss);font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:.7rem}
 .how-t{font-weight:700;font-size:15px;margin-bottom:.25rem}
 .how-d{font-size:13.5px;color:var(--ink2);line-height:1.5}
 
 /* YORUM */
 .y-section{padding:1.5rem;margin-top:1.25rem}
-.y-meta h2{font-size:1.35rem;font-weight:800;letter-spacing:-.3px}
+.y-meta h2{font-size:1.35rem;font-weight:700;letter-spacing:-.3px}
 .y-meta .sub{font-size:14px;color:var(--ink3)}
-#ph-av{border-radius:12px!important;background:var(--moss3);color:var(--moss)!important;border:none!important;font-weight:800;font-size:15px!important;width:48px!important;height:48px!important}
+#ph-av{border-radius:12px!important;background:var(--moss3);color:var(--moss)!important;border:none!important;font-weight:700;font-size:15px!important;width:48px!important;height:48px!important}
 .score-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem}
 .score-pill{background:var(--paper2);border-radius:var(--r-sm);padding:.7rem 1rem;min-width:110px}
-.sp-val{font-size:1.4rem;font-weight:800;line-height:1.1;color:var(--ink)}
+.sp-val{font-size:1.4rem;font-weight:700;line-height:1.1;color:var(--ink)}
 .sp-lbl{font-size:12.5px;color:var(--ink3);margin-top:2px}
 .sp-lbl::first-letter{text-transform:uppercase}
 .impact-note{font-size:13.5px;color:var(--ink2);margin-top:1rem;padding:.8rem 1rem;background:var(--paper2);border-radius:var(--r-sm);line-height:1.6}
@@ -237,12 +244,12 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 
 /* ADMİN */
 .admin-login{max-width:420px;margin:3.5rem auto;padding:2rem}
-.admin-login h3{font-size:1.3rem;font-weight:800;margin-bottom:1.25rem;color:var(--ink)}
+.admin-login h3{font-size:1.3rem;font-weight:700;margin-bottom:1.25rem;color:var(--ink)}
 .admin-panel{display:none}.admin-panel.on{display:block}
 .admin-panel .section-title{margin-bottom:0}
 .admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:2rem}
 .astat{padding:1.25rem;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-.astat-val{font-size:2.3rem;font-weight:800;line-height:1;color:var(--ink)}
+.astat-val{font-size:2.3rem;font-weight:700;line-height:1;color:var(--ink)}
 .astat-lbl{font-size:13px;font-weight:600;color:var(--ink3);margin-top:6px}
 .astat-lbl::first-letter{text-transform:uppercase}
 .queue-item{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:1.1rem 1.2rem;margin-bottom:.75rem}
@@ -309,9 +316,10 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
   <div id="analiz-section">
     <div class="form-section">
       <div class="section-title">Akademisyen ara</div>
+      <div class="adimlar"><div class="adim"><b>1</b>İsmini yaz</div><div class="adim"><b>2</b>Listeden seç</div><div class="adim"><b>3</b>"Analiz et"e bas</div></div>
       <div class="frow">
         <div class="ac-wrap"><label>akademisyen adı soyadı</label><input type="text" id="fi" placeholder="Ad soyad yazmaya başlayın…" autocomplete="off" oninput="acInput()" onkeydown="acKey(event)" onblur="setTimeout(acHide,180)"><div class="ac-list" id="ac-list"></div><div class="ac-picked" id="ac-picked"></div></div>
-        <div><label>unvan</label>
+        <div><label>Şu anki unvanı</label>
           <select id="fu">
             <optgroup label="Araştırma Görevlisi"><option>Arş. Gör.</option><option>Arş. Gör. Dr.</option></optgroup>
             <optgroup label="Öğretim Görevlisi"><option>Öğr. Gör.</option><option>Öğr. Gör. Dr.</option></optgroup>
@@ -320,7 +328,7 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
         </div>
       </div>
       <div class="frow">
-        <div><label>üniversite</label>
+        <div><label>Üniversite <span class="opt">(seçince kendiliğinden dolar)</span></label>
           <select id="funi">
             <option value="">— seçiniz —</option>
             <optgroup label="Ankara"><option>Ankara Üniversitesi</option><option>Gazi Üniversitesi</option><option>Hacettepe Üniversitesi</option><option>Orta Doğu Teknik Üniversitesi</option><option>Ankara Yıldırım Beyazıt Üniversitesi</option><option>Ankara Hacı Bayram Veli Üniversitesi</option></optgroup>
@@ -329,7 +337,7 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
             <optgroup label="Diğer"><option>Akdeniz Üniversitesi</option><option>Anadolu Üniversitesi</option><option>Atatürk Üniversitesi</option><option>Bursa Uludağ Üniversitesi</option><option>Çukurova Üniversitesi</option><option>Dicle Üniversitesi</option><option>Erciyes Üniversitesi</option><option>Eskişehir Teknik Üniversitesi</option><option>Eskişehir Osmangazi Üniversitesi</option><option>Fırat Üniversitesi</option><option>Gaziantep Üniversitesi</option><option>Gebze Teknik Üniversitesi</option><option>İnönü Üniversitesi</option><option>Karadeniz Teknik Üniversitesi</option><option>Kocaeli Üniversitesi</option><option>Konya Teknik Üniversitesi</option><option>Mersin Üniversitesi</option><option>Muğla Sıtkı Koçman Üniversitesi</option><option>Ondokuz Mayıs Üniversitesi</option><option>Pamukkale Üniversitesi</option><option>Sakarya Üniversitesi</option><option>Selçuk Üniversitesi</option><option>Sivas Cumhuriyet Üniversitesi</option><option>Süleyman Demirel Üniversitesi</option><option>TOBB Ekonomi ve Teknoloji Üniversitesi</option><option>Trakya Üniversitesi</option><option>Van Yüzüncü Yıl Üniversitesi</option><option>Yozgat Bozok Üniversitesi</option><option>Zonguldak Bülent Ecevit Üniversitesi</option></optgroup>
           </select>
         </div>
-        <div><label>bölüm</label>
+        <div><label>Bölüm <span class="opt">(isteğe bağlı)</span></label>
           <select id="fbol">
             <option value="">— seçiniz —</option>
             <optgroup label="Mühendislik"><option>Bilgisayar Mühendisliği</option><option>Elektrik-Elektronik Mühendisliği</option><option>Makine Mühendisliği</option><option>İnşaat Mühendisliği</option><option>Endüstri Mühendisliği</option><option>Yazılım Mühendisliği</option><option>Biyomedikal Mühendisliği</option></optgroup>
@@ -341,7 +349,7 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
           </select>
         </div>
       </div>
-      <div class="form-note">İsim yazdıkça Türkiye'deki eşleşen akademisyenler listelenir; listeden seçmeniz yeterli. Diğer alanlar otomatik dolar.</div>
+      <div class="form-note">İpucu: 3 harf yazınca Türkiye'deki eşleşen akademisyenler çıkar. Doğru kişiyi üniversitesinden tanıyabilirsiniz.</div>
       <div class="errbx" id="a-err"></div>
       <button class="btn primary btn-full" id="sbtn" onclick="baslat()" style="margin-top:1rem">Analiz et</button>
     </div>
@@ -410,7 +418,8 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 <div id="pg-yorum" class="page">
   <div class="form-section">
     <div class="section-title">Kimi değerlendirmek istiyorsunuz?</div>
-    <label>değerlendirmek istediğiniz akademisyen</label>
+    <div class="adimlar"><div class="adim"><b>1</b>Hocayı seç</div><div class="adim"><b>2</b>Yıldız ver, yorum yaz</div><div class="adim"><b>3</b>Okul e-postanı doğrula, gönder</div></div>
+    <label>Akademisyen <span class="opt">(listede yoksa aşağıdan ekleyin)</span></label>
     <select id="sel-hoca" onchange="loadProfil()" style="margin-bottom:1rem"></select>
     <div class="add-hoca-row">
       <div><label>yeni akademisyen ekle</label><input type="text" id="yeni-isim" placeholder="Ad soyad"></div>
