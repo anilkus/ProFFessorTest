@@ -3,315 +3,286 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16794d">
 <meta name="description" content="Transparent academic evaluation for Turkish universities. ProFFessorTest pulls real data from OpenAlex — H-index, citations, international collaboration — combines it with admin-approved student reviews, and maps each academic against their current title. No self-reporting. No gaming the system. Just what the data says.">
 <title>ProFFessorTest — Akademik Değerlendirme</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#1a1a1a;--ink2:#666;--ink3:#999;--ink4:#ccc;
-  --paper:#fff;--paper2:#f8f7f4;--paper3:#f0efe9;
-  --line:rgba(0,0,0,0.08);--line2:rgba(0,0,0,0.14);
-  --moss:#1a7a50;--moss2:#28a06a;--moss3:#e6f5ed;
-  --danger:#c03030;--warn:#8a5f00;
-  --serif:'Playfair Display',Georgia,serif;
-  --mono:'DM Mono','Courier New',monospace;
-  --sans:'DM Sans',-apple-system,sans-serif
+  --ink:#2f2c27;--ink2:#5b564d;--ink3:#857e72;--ink4:#b8af9f;
+  --paper:#fbf7ef;--paper2:#f3ede1;--paper3:#e8e0d0;--bg:#efe9dd;
+  --line:#e3dac9;--line2:#d0c5b1;
+  --moss:#2f7a52;--moss2:#3c9466;--moss3:#e1eedf;
+  --danger:#c53b3b;--warn:#a26a00;--warn3:#fdf3dc;--danger3:#fbe9e9;
+  --shadow:0 1px 2px rgba(60,45,20,.05),0 6px 20px rgba(60,45,20,.07);
+  --r:14px;--r-sm:10px;
+  --on-moss:#fff;
+  --sans:'Comic Relief','Comic Sans MS','Comic Sans','Chalkboard SE',system-ui,sans-serif;
+  --serif:var(--sans);--mono:var(--sans)
 }
-@media(prefers-color-scheme:dark){:root{
-  --ink:#e8e4dc;--ink2:#9e9890;--ink3:#6a6560;--ink4:#3a3730;
-  --paper:#111009;--paper2:#181510;--paper3:#201d15;
-  --line:rgba(255,255,255,0.08);--line2:rgba(255,255,255,0.14);
-  --moss:#28a06a;--moss2:#3bbf7e;--moss3:#0c2e1c;
-  --danger:#d45050;--warn:#c49030
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) input,:root:not([data-theme="light"]) select,:root:not([data-theme="light"]) textarea{background:var(--paper2)}}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink:#e6e1d6;--ink2:#b3ac9f;--ink3:#857e72;--ink4:#504a41;
+  --paper:#24211c;--paper2:#2c2822;--paper3:#363129;--bg:#1b1915;
+  --line:#38332b;--line2:#474036;
+  --moss:#34b277;--moss2:#45c486;--moss3:#163526;
+  --danger:#e06767;--warn:#e0a83e;--warn3:#3a2d10;--danger3:#3a1b1b;--on-moss:#08190f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)
 }}
 html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh}
 
 /* NAV */
-nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--paper);z-index:100}
-.logo{display:flex;align-items:center;gap:8px}
-.lmark{width:26px;height:26px;border-radius:4px;background:var(--moss);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0;font-family:var(--serif);font-style:italic;font-weight:700}
-.lname{font-family:var(--serif);font-style:italic;font-size:1.2rem;font-weight:400;color:var(--ink)}
-.ltag{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.2px}
-.nav-tabs{display:flex;gap:1.5rem}
-.ntab{font-family:var(--mono);font-size:11px;color:var(--ink3);background:none;border:none;cursor:pointer;padding:4px 0;letter-spacing:.3px;text-transform:lowercase;position:relative;display:flex;align-items:center;gap:5px;transition:color .12s}
-.ntab:hover{color:var(--ink2)}
-.ntab.on{color:var(--ink)}
-.ntab.on::after{content:'';position:absolute;bottom:-5px;left:0;right:0;height:1px;background:var(--moss)}
-.ntab.gold.on{color:var(--moss)}
-.ntab.gold.on::after{background:var(--moss)}
-#admin-badge{background:var(--moss);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;margin-left:3px;font-family:var(--mono)}
-.nav-right{font-family:var(--mono);font-size:10px;color:var(--ink4);display:flex;align-items:center;gap:5px}
-.ndot{width:5px;height:5px;border-radius:50%;background:var(--moss2)}
+nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 2rem;position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px}
+.lmark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--moss2),var(--moss));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:700;flex-shrink:0}
+.lname{font-size:1.1rem;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.ltag{font-size:12px;color:var(--ink3)}
+.nav-tabs{display:flex;gap:4px;background:var(--paper2);padding:4px;border-radius:999px;border:1px solid var(--line)}
+.ntab{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink2);background:none;border:none;cursor:pointer;padding:7px 16px;border-radius:999px;display:flex;align-items:center;gap:6px;transition:background .15s,color .15s}
+.ntab:hover{color:var(--ink)}
+.ntab.on{background:var(--paper);color:var(--moss);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#admin-badge{background:var(--danger);color:#fff;font-size:11px;font-weight:700;padding:0 6px;border-radius:999px;line-height:18px}
+.nav-right{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:6px}
+.ndot{width:7px;height:7px;border-radius:50%;background:var(--moss2);box-shadow:0 0 0 3px var(--moss3)}
 
 /* WRAP */
-.wrap{max-width:860px;margin:0 auto;padding:0 2.5rem 4rem}
+.wrap{max-width:880px;margin:0 auto;padding:0 1.5rem 4rem}
 .page{display:none}.page.on{display:block}
 
-/* DEMO */
-.demo-wrap{background:var(--paper2);border-bottom:1px solid var(--line);padding:2.5rem 2.5rem 2rem}
-.demo-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap}
-.demo-label{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:.4rem}
-.demo-title{font-family:var(--serif);font-style:italic;font-size:1.5rem;font-weight:400;color:var(--ink)}
-.step-nav{display:flex;gap:0;border:1px solid var(--line2);border-radius:3px;overflow:hidden;flex-shrink:0}
-.step-btn{font-family:var(--mono);font-size:10px;padding:5px 13px;background:transparent;border:none;border-right:1px solid var(--line2);color:var(--ink3);cursor:pointer;transition:all .15s;text-transform:lowercase;letter-spacing:.2px;white-space:nowrap}
-.step-btn:last-child{border-right:none}
-.step-btn:hover{background:var(--paper3);color:var(--ink2)}
-.step-btn.on{background:var(--ink);color:var(--paper)}
-.demo-body{min-height:200px}
-.dpanel{display:none;animation:dfade .3s ease}
-.dpanel.on{display:block}
-@keyframes dfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:.75rem}
-.demo-col-label{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:.65rem;padding-bottom:.4rem;border-bottom:1px solid var(--line)}
-.demo-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:.85rem}
-.demo-stat{background:var(--paper);border:1px solid var(--line);padding:.6rem .8rem}
-.demo-stat-n{font-family:var(--serif);font-size:1.5rem;font-weight:400;line-height:1;color:var(--ink)}
-.demo-stat-l{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px}
-.demo-bar-row{display:flex;align-items:center;gap:.75rem;margin-bottom:6px}
-.demo-bar-label{font-family:var(--mono);font-size:10.5px;color:var(--ink2);min-width:120px;text-transform:lowercase}
-.demo-bar-track{flex:1;height:2px;background:var(--line2)}
-.demo-bar-fill{height:100%;background:var(--ink);transition:width 1s cubic-bezier(.4,0,.2,1)}
-.demo-bar-val{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:32px;text-align:right}
-.demo-yorum{border-left:2px solid var(--moss2);padding:.65rem .9rem;margin-bottom:.65rem;background:var(--paper);transition:all .45s}
-.demo-yorum.pending{border-left-color:var(--line2);opacity:.5}
-.yr-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem}
-.yr-rol{font-family:var(--mono);font-size:10px;color:var(--ink3);padding:1px 6px;border:1px solid var(--line)}
-.yr-status{font-family:var(--mono);font-size:10px}
-.yr-text{font-size:12.5px;color:var(--ink2);line-height:1.55}
-.demo-unvan{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-.demo-unvan-label{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:.35rem}
-.demo-unvan-num{font-family:var(--serif);font-size:2.6rem;font-weight:400;line-height:1;letter-spacing:-1.5px;color:var(--ink)}
-.demo-unvan-bar{height:1px;background:var(--line2);margin:.45rem 0}
-.demo-unvan-fill{height:100%;background:var(--moss2)}
-.demo-unvan-msg{font-size:12px;color:var(--ink2);line-height:1.5}
-.demo-input-mock{border-bottom:1px solid var(--line2);padding:5px 0;font-size:13.5px;color:var(--ink);margin-top:4px;min-height:28px}
-.cursor{display:inline-block;width:1px;height:14px;background:var(--ink);margin-left:1px;animation:blink .8s step-end infinite;vertical-align:middle}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.demo-info-row{display:flex;gap:.6rem;margin-bottom:.5rem;align-items:flex-start}
-.demo-info-n{font-family:var(--mono);font-size:9.5px;color:var(--ink4);min-width:18px;margin-top:2px}
-.demo-info-v{font-size:12.5px;color:var(--ink2);line-height:1.55}
-.demo-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--line)}
-.demo-dots{display:flex;gap:5px}
-.d-dot{width:5px;height:5px;border-radius:50%;background:var(--paper3);border:1px solid var(--line2);cursor:pointer;transition:all .15s}
-.d-dot.on{background:var(--ink);border-color:var(--ink)}
-.demo-progress{font-family:var(--mono);font-size:10px;color:var(--ink4)}
-.demo-cta{font-family:var(--mono);font-size:11px;color:var(--moss2);display:flex;align-items:center;gap:5px;cursor:pointer;background:none;border:none;padding:0;text-transform:lowercase;letter-spacing:.2px}
-.demo-cta:hover{color:var(--moss)}
-
 /* HERO */
-.hero-wrap{border-bottom:1px solid var(--line);padding:2.5rem 0}
-.hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:0}
-.hero-left{padding-right:2.5rem;border-right:1px solid var(--line)}
-.hero-right{padding-left:2.5rem;display:flex;flex-direction:column;justify-content:space-between}
-.hero-no{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.4px;margin-bottom:.65rem}
-h1{font-family:var(--serif);font-size:2.6rem;font-weight:400;font-style:italic;line-height:1.1;letter-spacing:-.4px;color:var(--ink);margin-bottom:1.1rem}
-.hero-desc{font-size:13.5px;color:var(--ink2);line-height:1.75;max-width:300px;margin-bottom:1.5rem}
-.hero-cta{font-family:var(--mono);font-size:11px;color:var(--ink2);display:inline-flex;align-items:center;gap:5px;text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:2px;transition:color .12s;background:none;border-top:none;border-left:none;border-right:none;cursor:pointer}
-.hero-cta:hover{color:var(--ink)}
-.hero-src-title{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:.65rem}
-.hero-src-item{display:flex;gap:.6rem;margin-bottom:.5rem;align-items:flex-start}
-.hero-src-n{font-family:var(--mono);font-size:9.5px;color:var(--ink4);min-width:18px;margin-top:2px}
-.hero-src-v{font-size:12.5px;color:var(--ink2)}
+.hero{text-align:center;padding:3.5rem 0 1.75rem}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--moss);background:var(--moss3);padding:5px 12px;border-radius:999px;margin-bottom:1.1rem}
+h1{font-size:clamp(2rem,5vw,2.9rem);font-weight:700;line-height:1.12;letter-spacing:-1px;color:var(--ink);margin-bottom:.9rem}
+h1 em{font-style:normal;color:var(--moss)}
+.hero-desc{font-size:17px;color:var(--ink2);line-height:1.6;max-width:560px;margin:0 auto}
 
-/* FORM */
-.form-section{padding:2rem 0;border-bottom:1px solid var(--line)}
-.section-no{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.4px;margin-bottom:.4rem}
-.section-title{font-family:var(--serif);font-style:italic;font-size:1.2rem;font-weight:400;color:var(--ink);margin-bottom:1.1rem}
-label{display:block;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:4px;letter-spacing:.3px;text-transform:lowercase}
-input,select,textarea{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line2);color:var(--ink);padding:6px 0;font-size:13.5px;font-family:var(--sans);outline:none;transition:border-color .12s;border-radius:0;-webkit-appearance:none;appearance:none}
-input:focus,select:focus,textarea:focus{border-bottom-color:var(--ink)}
+/* KARTLAR */
+.form-section,.datapanel,.res,.y-section,.admin-login,.how,.pbox{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.form-section{padding:1.75rem;margin-top:1.25rem}
+.section-no{font-size:13px;font-weight:700;color:var(--moss);margin-bottom:.35rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.section-title{font-size:1.35rem;font-weight:700;letter-spacing:-.3px;color:var(--ink);margin-bottom:1.1rem}
+label{display:block;font-size:15px;font-weight:700;color:var(--ink2);margin-bottom:6px}
+label::first-letter{text-transform:uppercase}
+input,select,textarea{width:100%;background:#fffdf8;border:1.5px solid var(--line2);border-radius:var(--r-sm);color:var(--ink);padding:11px 14px;font-size:15px;font-family:var(--sans);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--ink3) 50%),linear-gradient(135deg,var(--ink3) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+input:focus,select:focus,textarea:focus{border-color:var(--moss2);box-shadow:0 0 0 4px var(--moss3)}
 input::placeholder,textarea::placeholder{color:var(--ink4)}
 select option{background:var(--paper);color:var(--ink)}
-textarea{min-height:80px;border:1px solid var(--line2);padding:8px 10px;margin-top:4px;resize:vertical}
-textarea:focus{border-color:var(--ink)}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem}
-.form-note{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.75rem}
+textarea{min-height:110px;resize:vertical;line-height:1.6}
+#fi{font-size:17px;padding:14px 16px;border-width:2px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-note{font-size:14px;color:var(--ink3);margin-top:.5rem;line-height:1.55}
+
+/* ADIM REHBERİ */
+.adimlar{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
+.adim{display:flex;align-items:center;gap:8px;background:var(--paper2);border-radius:999px;padding:6px 14px 6px 6px;font-size:15px;color:var(--ink2)}
+.adim b{width:26px;height:26px;border-radius:50%;background:var(--moss);color:var(--on-moss);display:flex;align-items:center;justify-content:center;font-size:14px}
+.opt{font-weight:400;color:var(--ink3);font-size:13.5px}
 
 /* BUTONLAR */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid var(--line2);background:transparent;color:var(--ink2);font-family:var(--mono);font-size:11px;cursor:pointer;text-transform:lowercase;letter-spacing:.2px;transition:all .12s;border-radius:3px}
-.btn:hover{background:var(--paper2);color:var(--ink);border-color:var(--ink3)}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.btn.primary:hover{background:var(--ink2);border-color:var(--ink2)}
-.btn-full{width:100%;justify-content:center}
-.btn.ok{background:var(--moss3);color:var(--moss);border-color:var(--moss2)}
-.btn.ok:hover{background:var(--moss2);color:#fff}
-.btn.danger{background:rgba(192,48,48,.06);color:var(--danger);border-color:rgba(192,48,48,.18)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:1.5px solid var(--line2);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{border-color:var(--ink3);background:var(--paper2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--moss);color:var(--on-moss);border-color:var(--moss)}
+.btn.primary:hover{background:var(--moss2);border-color:var(--moss2)}
+.btn-full{width:100%;padding:14px;font-size:16px}
+.btn.ok{background:var(--moss3);color:var(--moss);border-color:transparent}
+.btn.ok:hover{background:var(--moss);color:var(--on-moss)}
+.btn.danger{background:var(--danger3);color:var(--danger);border-color:transparent}
+.btn.danger:hover{background:var(--danger);color:#fff}
 
 /* HATA */
-.errbx{border-left:2px solid var(--danger);padding:.65rem .9rem;font-size:12px;color:var(--danger);display:none;margin-top:.75rem;font-family:var(--mono)}
+.errbx{background:var(--danger3);border-radius:var(--r-sm);padding:.75rem 1rem;font-size:14px;color:var(--danger);display:none;margin-top:.9rem}
 
 /* PROGRESS */
-.prog{display:none;margin:1rem 0}.prog.on{display:block}
-.pbox{border-left:2px solid var(--line2);padding:1.1rem 1.4rem}
-.ptitle{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-bottom:.85rem;display:flex;align-items:center;gap:7px;text-transform:lowercase}
-.steps{display:flex;flex-direction:column;gap:7px}
-.step{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--ink4);text-transform:lowercase}
-.step.act{color:var(--ink)}.step.ok{color:var(--moss2)}.step.err{color:var(--danger)}
-.sic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;border:1px solid var(--line2)}
-.step.act .sic{border-color:var(--ink);color:var(--ink)}
-.step.ok .sic{border-color:var(--moss2);color:var(--moss2)}
-.step.err .sic{border-color:var(--danger);color:var(--danger)}
+.prog{display:none;margin:1.25rem 0}.prog.on{display:block}
+.pbox{padding:1.25rem 1.5rem}
+.ptitle{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:.9rem;display:flex;align-items:center;gap:8px}
+.steps{display:flex;flex-direction:column;gap:9px}
+.step{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink3)}
+.step span:last-child::first-letter{text-transform:uppercase}
+.step.act{color:var(--ink);font-weight:600}.step.ok{color:var(--moss)}.step.err{color:var(--danger)}
+.sic{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:var(--paper2);border:1.5px solid var(--line2)}
+.step.act .sic{border-color:var(--moss2);color:var(--moss)}
+.step.ok .sic{background:var(--moss);border-color:var(--moss);color:#fff}
+.step.err .sic{background:var(--danger);border-color:var(--danger);color:#fff}
 @keyframes rot{to{transform:rotate(360deg)}}
 .spin{animation:rot 1s linear infinite;display:inline-block}
 
 /* DATA PANELİ */
-.datapanel{display:none;border-top:1px solid var(--line);padding-top:1.25rem;margin-top:1.25rem}
+.datapanel{display:none;padding:1.5rem;margin-top:1.25rem}
 .datapanel.on{display:block}
-.dpgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:.75rem}
-.dpgrid2{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-.dstat-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.2px;text-transform:lowercase;margin-bottom:.3rem}
-.dstat-val{font-family:var(--serif);font-size:1.7rem;font-weight:400;line-height:1;color:var(--ink);letter-spacing:-.4px}
-.dstat-sub{font-family:var(--mono);font-size:10px;color:var(--ink4);margin-top:2px}
-.src-tag{font-family:var(--mono);font-size:10px;display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--line)}
-.src-tag.ok{border-color:var(--moss2);color:var(--moss2)}
-.src-tag.no{color:var(--ink3)}
+.dpgrid,.dpgrid2{display:grid;gap:.75rem;margin-bottom:.75rem}
+.dpgrid{grid-template-columns:repeat(4,1fr)}
+.dpgrid2{grid-template-columns:repeat(3,1fr)}
+.dpgrid>div,.dpgrid2>div{background:var(--paper2);border-radius:var(--r-sm);padding:.9rem 1rem}
+.dstat-lbl{font-size:12.5px;font-weight:600;color:var(--ink3);margin-bottom:.25rem}
+.dstat-lbl::first-letter{text-transform:uppercase}
+.dstat-val{font-size:1.75rem;font-weight:700;line-height:1.1;color:var(--ink);letter-spacing:-.5px}
+.dstat-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.src-tag{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;background:var(--paper2);color:var(--ink3)}
+.src-tag.ok{background:var(--moss3);color:var(--moss)}
 .ac-wrap{position:relative}
-.ac-list{display:none;position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--paper);border:1px solid var(--line2);max-height:320px;overflow-y:auto}
+.ac-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:50;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 32px rgba(0,0,0,.14);max-height:340px;overflow-y:auto;padding:6px}
 .ac-list.on{display:block}
-.ac-item{padding:.55rem .75rem;cursor:pointer;border-bottom:1px solid var(--line)}
-.ac-item:last-child{border-bottom:none}
-.ac-item:hover,.ac-item.sel{background:var(--paper2)}
-.ac-name{font-size:13.5px;color:var(--ink)}
-.ac-meta{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px}
-.ac-msg{padding:.55rem .75rem;font-family:var(--mono);font-size:10px;color:var(--ink3)}
-.ac-picked{font-family:var(--mono);font-size:10px;color:var(--moss2);margin-top:4px;display:none}
-.ac-picked.on{display:block}
-.orcid-row{margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--line)}
-.orcid-list{margin-top:.5rem;font-size:12.5px;color:var(--ink2);line-height:1.7}
-.orcid-list b{font-family:var(--mono);font-size:10px;font-weight:400;color:var(--ink3);text-transform:lowercase;margin-right:4px}
+.ac-item{padding:.7rem .85rem;cursor:pointer;border-radius:var(--r-sm)}
+.ac-item:hover,.ac-item.sel{background:var(--moss3)}
+.ac-name{font-size:15px;font-weight:600;color:var(--ink)}
+.ac-meta{font-size:12.5px;color:var(--ink3);margin-top:2px}
+.ac-msg{padding:.7rem .85rem;font-size:13.5px;color:var(--ink3)}
+.ac-picked{font-size:13px;font-weight:600;color:var(--moss);background:var(--moss3);border-radius:8px;padding:6px 10px;margin-top:8px;display:none}
+.ac-picked.on{display:inline-block}
+.orcid-row{margin-top:.75rem;padding:1rem;background:var(--paper2);border-radius:var(--r-sm)}
+.orcid-list{margin-top:.5rem;font-size:14px;color:var(--ink2);line-height:1.75}
+.orcid-list b{font-size:12.5px;font-weight:700;color:var(--ink3);margin-right:6px}
 
-/* RESULTS */
-.res{display:none}.res.on{display:block}
-.prof-split{display:grid;grid-template-columns:90px 1fr;gap:0;border-top:1px solid var(--line);padding:2rem 0}
-.prof-score{border-right:1px solid var(--line);padding-right:2rem;padding-top:.25rem}
-.score-big{font-family:var(--serif);font-size:3.8rem;font-weight:400;line-height:1;letter-spacing:-2px;color:var(--ink)}
-.score-max{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:3px}
-.score-gr{font-family:var(--mono);font-size:11px;margin-top:.5rem;color:var(--moss2)}
-.prof-body{padding-left:2rem}
-.prof-name{font-family:var(--serif);font-style:italic;font-size:1.3rem;font-weight:400;color:var(--ink);margin-bottom:2px}
-.prof-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-bottom:.9rem}
-.tagrow{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem}
-.tag{font-family:var(--mono);font-size:10px;padding:2px 7px;border:1px solid var(--line);color:var(--ink3)}
-.tag.green{border-color:var(--moss2);color:var(--moss2)}
-.tag.red{border-color:var(--danger);color:var(--danger)}
-.tag.orange{border-color:var(--warn);color:var(--warn)}
-.tag.accent{color:var(--ink2)}
-.dims{display:flex;flex-direction:column;gap:7px}
-.dimrow{display:flex;align-items:center;gap:9px}
-.dname{font-family:var(--mono);font-size:11px;color:var(--ink2);min-width:140px;text-transform:lowercase}
-.dtrack{flex:1;height:1px;background:var(--line2)}
-.dfill{height:100%}
-.dval{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:32px;text-align:right}
-.ucards{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
-.ucard{padding:1.5rem 0}
-.ucard+.ucard{padding-left:2rem;border-left:1px solid var(--line)}
-.ucard:not(:last-child){padding-right:2rem}
-.uclbl{font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:lowercase;letter-spacing:.2px;margin-bottom:.4rem}
-.ucnum{font-family:var(--serif);font-size:2.6rem;font-weight:400;line-height:1;letter-spacing:-1.5px;color:var(--ink);margin-bottom:.3rem}
-.ucbar{height:1px;background:var(--line2);margin:.5rem 0 .6rem}
-.ucfill{height:100%}
-.ucmsg{font-size:12.5px;color:var(--ink2);line-height:1.6}
-.ucmsg b{font-weight:500;color:var(--ink);display:block;margin-bottom:2px}
-.ucexik{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:.4rem;line-height:1.8}
-.ucexik span{display:block;padding-left:10px;position:relative}
-.ucexik span::before{content:'–';position:absolute;left:0;color:var(--ink4)}
-.badge-down{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;padding:4px 10px;margin-top:.6rem;border:1px solid rgba(192,48,48,.22);color:var(--danger)}
-.bulg-wrap{border-top:1px solid var(--line);padding:1.5rem 0}
-.bulg{display:flex;gap:9px;padding:.65rem 0;border-bottom:1px solid var(--line)}
-.bulg:last-child{border-bottom:none}
-.bicon{font-size:12px;flex-shrink:0;margin-top:2px;color:var(--ink3)}
-.bbody{font-size:12.5px;color:var(--ink2);line-height:1.6}
-.bbody b{font-weight:500;color:var(--ink);display:block;margin-bottom:1px}
-.anal-wrap{border-top:1px solid var(--line);padding:1.5rem 0}
-.rawtext{font-family:var(--mono);font-size:11.5px;color:var(--ink2);line-height:1.85;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;border-left:2px solid var(--line2);padding-left:.9rem}
-.disc{font-family:var(--mono);font-size:10px;color:var(--ink4);line-height:1.7;margin-top:.85rem;display:flex;gap:6px}
+/* SONUÇ */
+.res{display:none;margin-top:1.25rem;overflow:hidden}.res.on{display:block}
+.prof-split{display:grid;grid-template-columns:150px 1fr;gap:1.75rem;padding:1.75rem}
+.prof-score{background:var(--paper2);border-radius:var(--r);padding:1.25rem .75rem;text-align:center;align-self:start}
+.score-big{font-size:3.6rem;font-weight:700;line-height:1;letter-spacing:-2px;color:var(--ink)}
+.score-max{font-size:13px;color:var(--ink3);margin-top:4px}
+.score-gr{display:inline-block;font-size:13px;font-weight:700;margin-top:.6rem;padding:3px 12px;border-radius:999px;background:var(--paper);text-transform:capitalize}
+.prof-name{font-size:1.5rem;font-weight:700;letter-spacing:-.3px;color:var(--ink);margin-bottom:2px}
+.prof-sub{font-size:14px;color:var(--ink3);margin-bottom:.9rem}
+.tagrow{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.1rem}
+.tag{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--paper2);color:var(--ink2)}
+.tag.green{background:var(--moss3);color:var(--moss)}
+.tag.red{background:var(--danger3);color:var(--danger)}
+.tag.orange{background:var(--warn3);color:var(--warn)}
+.dims{display:flex;flex-direction:column;gap:10px}
+.dimrow{display:grid;grid-template-columns:minmax(150px,200px) 1fr 56px;align-items:center;gap:12px}
+.dname{font-size:14px;color:var(--ink2)}
+.dname::first-letter{text-transform:uppercase}
+.dtrack{height:8px;background:var(--paper3);border-radius:999px;overflow:hidden}
+.dfill{height:100%;border-radius:999px;background:var(--moss2)!important}
+.dval{font-size:13.5px;font-weight:700;color:var(--ink);text-align:right}
+.ucards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:0 1.75rem 1.75rem}
+.ucard{background:var(--paper2);border-radius:var(--r);padding:1.25rem}
+.uclbl{font-size:13px;font-weight:600;color:var(--ink3);margin-bottom:.4rem}
+.uclbl::first-letter{text-transform:uppercase}
+.ucnum{font-size:2.4rem;font-weight:700;line-height:1;letter-spacing:-1px;color:var(--ink);margin-bottom:.3rem}
+.ucbar{height:8px;background:var(--paper3);border-radius:999px;margin:.6rem 0 .7rem;overflow:hidden}
+.ucfill{height:100%;border-radius:999px}
+.ucmsg{font-size:14px;color:var(--ink2);line-height:1.6}
+.ucmsg b{font-weight:700;color:var(--ink);display:block;margin-bottom:2px}
+.ucexik{font-size:13px;color:var(--ink2);margin-top:.5rem;display:flex;flex-wrap:wrap;gap:6px}
+.ucexik span{display:inline-block;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.badge-down{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:5px 12px;margin-top:.75rem;border-radius:999px;background:var(--danger3);color:var(--danger)}
+.bulg-wrap,.anal-wrap{padding:1.5rem 1.75rem;border-top:1px solid var(--line)}
+.bulg{display:flex;gap:12px;padding:.8rem 1rem;border-radius:var(--r-sm);background:var(--paper2);margin-top:.5rem}
+.bulg.green{background:var(--moss3)}.bulg.orange{background:var(--warn3)}.bulg.red{background:var(--danger3)}
+.bicon{font-size:14px;font-weight:700;flex-shrink:0;margin-top:1px;color:var(--ink3)}
+.bulg.green .bicon{color:var(--moss)}.bulg.orange .bicon{color:var(--warn)}.bulg.red .bicon{color:var(--danger)}
+.bbody{font-size:14px;color:var(--ink2);line-height:1.55}
+.bbody b{font-weight:700;color:var(--ink)}
+.rawtext{font-size:14px;color:var(--ink2);line-height:1.8;white-space:pre-wrap;word-break:break-word;background:var(--paper2);border-radius:var(--r-sm);padding:1rem 1.1rem}
+.disc{font-size:12.5px;color:var(--ink3);line-height:1.6;margin-top:.9rem}
+.res>div:last-child{padding:0 1.75rem 1.75rem!important;border-top:none!important}
+
+/* NASIL ÇALIŞIR */
+.how{padding:1.75rem;margin-top:2rem}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:.5rem}
+.how-item{background:var(--paper2);border-radius:var(--r);padding:1.1rem}
+.how-n{width:30px;height:30px;border-radius:9px;background:var(--moss3);color:var(--moss);font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:.7rem}
+.how-t{font-weight:700;font-size:15px;margin-bottom:.25rem}
+.how-d{font-size:13.5px;color:var(--ink2);line-height:1.5}
 
 /* YORUM */
-.y-section{border-top:1px solid var(--line);padding:1.5rem 0;margin-bottom:.75rem}
-.score-row{display:flex;gap:1.5rem;flex-wrap:wrap;padding-top:1rem;border-top:1px solid var(--line);margin-top:.75rem}
-.sp-val{font-family:var(--serif);font-size:1.4rem;font-weight:400;line-height:1;color:var(--ink)}
-.sp-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px;text-transform:lowercase}
-.impact-note{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:.75rem;padding:.55rem .85rem;border-left:2px solid var(--line2);line-height:1.6}
-.rol-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:1rem}
-.rol-btn{background:transparent;border:1px solid var(--line);padding:.4rem;font-family:var(--mono);font-size:11px;color:var(--ink3);cursor:pointer;text-align:center;transition:all .12s;text-transform:lowercase;border-radius:3px}
-.rol-btn:hover{color:var(--ink2);border-color:var(--line2)}
-.rol-btn.on{border-color:var(--ink);color:var(--ink)}
-.rol-weight{font-size:10px;color:var(--ink4);margin-top:1px}
-.star-row{display:flex;gap:4px;margin-top:4px}
-.star{font-size:18px;cursor:pointer;color:var(--ink4);user-select:none;transition:color .1s}
-.star.on{color:var(--ink)}
-.yf-cats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1rem}
-.cat-item{display:flex;align-items:center;justify-content:space-between;padding:.4rem .7rem;border:1px solid var(--line)}
-.cat-lbl{font-family:var(--mono);font-size:11px;color:var(--ink2);text-transform:lowercase}
-.cat-stars{display:flex;gap:2px}
-.cat-star{font-size:13px;cursor:pointer;color:var(--ink4);user-select:none}
-.cat-star.on{color:var(--ink)}
-.toast{display:none;border-left:2px solid var(--moss2);padding:.65rem 1rem;font-family:var(--mono);font-size:11px;color:var(--moss2);margin-top:.7rem;align-items:center;gap:7px}
+.y-section{padding:1.5rem;margin-top:1.25rem}
+.y-meta h2{font-size:1.35rem;font-weight:700;letter-spacing:-.3px}
+.y-meta .sub{font-size:14px;color:var(--ink3)}
+#ph-av{border-radius:12px!important;background:var(--moss3);color:var(--moss)!important;border:none!important;font-weight:700;font-size:15px!important;width:48px!important;height:48px!important}
+.score-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem}
+.score-pill{background:var(--paper2);border-radius:var(--r-sm);padding:.7rem 1rem;min-width:110px}
+.sp-val{font-size:1.4rem;font-weight:700;line-height:1.1;color:var(--ink)}
+.sp-lbl{font-size:12.5px;color:var(--ink3);margin-top:2px}
+.sp-lbl::first-letter{text-transform:uppercase}
+.impact-note{font-size:13.5px;color:var(--ink2);margin-top:1rem;padding:.8rem 1rem;background:var(--paper2);border-radius:var(--r-sm);line-height:1.6}
+.rol-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1.25rem}
+.rol-btn{background:var(--paper);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.7rem;font-size:14px;font-weight:700;color:var(--ink2);cursor:pointer;text-align:center;transition:all .15s}
+.rol-btn:hover{border-color:var(--ink3)}
+.rol-btn.on{border-color:var(--moss2);background:var(--moss3);color:var(--moss)}
+.rol-weight{font-size:12px;font-weight:500;color:var(--ink3);margin-top:1px}
+.star-row{display:flex;gap:6px;margin-top:2px}
+.star{font-size:30px;line-height:1;cursor:pointer;color:var(--ink4);user-select:none;transition:color .1s,transform .1s}
+.star:hover{transform:scale(1.12)}
+.star.on{color:#f2b01e}
+.yf-cats{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.25rem}
+.cat-item{display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;border-radius:var(--r-sm);background:var(--paper2)}
+.cat-lbl{font-size:14px;color:var(--ink2)}
+.cat-lbl::first-letter{text-transform:uppercase}
+.cat-stars{display:flex;gap:3px}
+.cat-star{font-size:19px;cursor:pointer;color:var(--ink4);user-select:none}
+.cat-star.on{color:#f2b01e}
+.toast{display:none;background:var(--moss3);border-radius:var(--r-sm);padding:.8rem 1rem;font-size:14px;font-weight:600;color:var(--moss);margin-top:.9rem;align-items:center;gap:7px}
 .toast.on{display:flex}
-.auth-box{border:1px solid var(--line);padding:.85rem 1rem;margin-bottom:1rem;font-size:12.5px;color:var(--ink2)}
-.auth-box .auth-ok{font-family:var(--mono);font-size:11px;color:var(--moss2)}
-.auth-box .auth-row{display:flex;gap:.6rem;align-items:flex-end;margin-top:.5rem}
+.auth-box{border:1.5px dashed var(--line2);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:1rem;font-size:14px;color:var(--ink2)}
+.auth-box .auth-ok{font-size:14px;font-weight:600;color:var(--moss)}
+.auth-box .auth-row{display:flex;gap:.6rem;align-items:stretch;margin-top:.6rem}
 .auth-box .auth-row input{flex:1}
-.auth-note{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.45rem;line-height:1.6}
-.linkbtn{background:none;border:none;color:var(--ink3);font-family:var(--mono);font-size:10px;text-decoration:underline;cursor:pointer;padding:0;margin-left:.5rem}
-.yorum-item{padding:.85rem 0;border-bottom:1px solid var(--line)}
-.yorum-item:last-child{border-bottom:none}
-.yi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
-.yi-meta{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
-.yi-rol{font-family:var(--mono);font-size:10px;padding:2px 6px;border:1px solid var(--line);color:var(--ink3)}
-.yi-stars{font-size:11px;color:var(--ink2)}
-.yi-date{font-family:var(--mono);font-size:10px;color:var(--ink4)}
-.yi-text{font-size:12.5px;color:var(--ink2);line-height:1.65}
-.yi-cats{display:flex;gap:.3rem;flex-wrap:wrap;margin:.35rem 0}
-.yi-cat{font-family:var(--mono);font-size:10px;padding:2px 6px;border:1px solid var(--line);color:var(--ink3)}
-.add-hoca-row{display:grid;grid-template-columns:1fr 1fr auto;gap:.75rem;margin-top:1rem;align-items:flex-end}
-.empty{font-family:var(--mono);text-align:center;padding:2rem;font-size:11px;color:var(--ink3)}
-.loading{font-family:var(--mono);text-align:center;padding:1.5rem;font-size:11px;color:var(--ink3);display:flex;align-items:center;justify-content:center;gap:7px}
+.auth-note{font-size:12.5px;color:var(--ink3);margin-top:.5rem;line-height:1.55}
+.linkbtn{background:none;border:none;color:var(--ink3);font-family:var(--sans);font-size:13px;text-decoration:underline;cursor:pointer;padding:0;margin-left:.6rem}
+.yorum-item{padding:1rem 1.1rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);margin-bottom:.6rem}
+.yi-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.4rem;flex-wrap:wrap}
+.yi-meta{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.yi-rol{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;border:none!important}
+.yi-stars{font-size:14px;color:#f2b01e;letter-spacing:1px}
+.yi-date{font-size:12.5px;color:var(--ink3)}
+.yi-text{font-size:14.5px;color:var(--ink);line-height:1.65}
+.yi-cats,.qi-cats{display:flex;gap:.35rem;flex-wrap:wrap;margin:.4rem 0}
+.yi-cat{font-size:12px;padding:2px 9px;border-radius:999px;background:var(--paper2);color:var(--ink2)}
+.add-hoca-row{display:grid;grid-template-columns:1fr 1fr auto;gap:.75rem;margin-top:1rem;align-items:end;padding-top:1rem;border-top:1px solid var(--line)}
+.empty{text-align:center;padding:2rem;font-size:14px;color:var(--ink3);background:var(--paper);border:1.5px dashed var(--line2);border-radius:var(--r)}
+.loading{text-align:center;padding:1.5rem;font-size:14px;color:var(--ink3);display:flex;align-items:center;justify-content:center;gap:8px}
 
 /* ADMİN */
-.admin-login{max-width:380px;margin:4rem auto;padding:2rem;border:1px solid var(--line)}
-.admin-login h3{font-family:var(--serif);font-style:italic;font-size:1.1rem;font-weight:400;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.admin-login{max-width:420px;margin:3.5rem auto;padding:2rem}
+.admin-login h3{font-size:1.3rem;font-weight:700;margin-bottom:1.25rem;color:var(--ink)}
 .admin-panel{display:none}.admin-panel.on{display:block}
-.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);margin-bottom:2rem}
-.astat{padding:1.25rem;text-align:center}
-.astat+.astat{border-left:1px solid var(--line)}
-.astat-val{font-family:var(--serif);font-size:2.4rem;font-weight:400;line-height:1;letter-spacing:-1px;color:var(--ink)}
-.astat-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:4px;text-transform:lowercase}
-.queue-item{border-bottom:1px solid var(--line);padding:1.1rem 0}
-.queue-item:last-child{border-bottom:none}
-.qi-hoca{font-family:var(--serif);font-style:italic;font-size:1rem;font-weight:400;margin-bottom:3px}
-.qi-meta{font-family:var(--mono);font-size:10.5px;color:var(--ink3);display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:.5rem}
-.qi-text{font-size:12.5px;color:var(--ink2);line-height:1.6;border-left:2px solid var(--line2);padding-left:.85rem;margin-bottom:.55rem}
-.qi-cats{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.55rem}
+.admin-panel .section-title{margin-bottom:0}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:2rem}
+.astat{padding:1.25rem;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.astat-val{font-size:2.3rem;font-weight:700;line-height:1;color:var(--ink)}
+.astat-lbl{font-size:13px;font-weight:600;color:var(--ink3);margin-top:6px}
+.astat-lbl::first-letter{text-transform:uppercase}
+.queue-item{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:1.1rem 1.2rem;margin-bottom:.75rem}
+.qi-hoca{font-size:16px;font-weight:700;margin-bottom:4px}
+.qi-meta{font-size:13px;color:var(--ink3);display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem}
+.qi-meta span:first-child{border:none!important;border-radius:999px;font-family:var(--sans)!important;font-weight:700}
+.qi-text{font-size:14.5px;color:var(--ink);line-height:1.6;background:var(--paper2);border-radius:var(--r-sm);padding:.75rem .9rem;margin-bottom:.75rem}
 .qi-actions{display:flex;gap:.5rem}
 
-@media(max-width:600px){
-  nav{padding:.9rem 1.25rem;flex-wrap:wrap;gap:.5rem}
-  .ntab.on::after{display:none}
-  .wrap{padding:0 1.25rem 3rem}
-  .demo-wrap{padding:1.5rem 1.25rem}
-  .demo-grid,.hero-grid,.frow,.ucards,.admin-stats{display:flex;flex-direction:column}
-  .hero-left{border-right:none;padding-right:0;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}
-  .hero-right{padding-left:0;padding-top:1.5rem}
-  .prof-split{grid-template-columns:1fr}
-  .prof-score{border-right:none;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:1rem}
-  .prof-body{padding-left:0;padding-top:1rem}
-  .ucard+.ucard{padding-left:0;border-left:none;border-top:1px solid var(--line)}
-  .yf-cats,.rol-grid,.dpgrid{grid-template-columns:1fr 1fr}
-  .dpgrid2{grid-template-columns:1fr}
-  .add-hoca-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
-  .add-hoca-row .btn{grid-column:1/-1}
-  h1{font-size:2rem}
-  .demo-stat-row{grid-template-columns:1fr 1fr}
-  .demo-unvan{grid-template-columns:1fr}
-  .step-nav{flex-wrap:wrap}
+@media(max-width:700px){
+  nav{padding:.7rem 1rem;flex-wrap:wrap}
+  .ltag,.nav-right{display:none}
+  .nav-tabs{order:3;width:100%;justify-content:space-between}
+  .ntab{flex:1;justify-content:center;padding:8px 6px}
+  .wrap{padding:0 1rem 3rem}
+  .hero{padding:2rem 0 1rem}
+  .hero-desc{font-size:15.5px}
+  .form-section{padding:1.25rem}
+  .frow,.ucards,.how-grid{grid-template-columns:1fr}
+  .how-grid{grid-template-columns:1fr 1fr}
+  .prof-split{grid-template-columns:1fr;padding:1.25rem;gap:1.25rem}
+  .ucards{padding:0 1.25rem 1.25rem}
+  .bulg-wrap,.anal-wrap{padding:1.25rem}
+  .res>div:last-child{padding:0 1.25rem 1.25rem!important}
+  .dimrow{grid-template-columns:1fr 48px;row-gap:4px}
+  .dimrow .dtrack{grid-column:1/-1;grid-row:2}
+  .dpgrid{grid-template-columns:1fr 1fr}
+  .dpgrid2{grid-template-columns:1fr 1fr 1fr}
+  .dpgrid2 .dstat-val{font-size:1.35rem}
+  .yf-cats{grid-template-columns:1fr}
+  .add-hoca-row{grid-template-columns:1fr}
+  .admin-stats{gap:.5rem}
+  .auth-box .auth-row{flex-direction:column}
 }
 </style>
 </head>
@@ -321,163 +292,34 @@ textarea:focus{border-color:var(--ink)}
   <div class="logo">
     <div class="lmark">P</div>
     <span class="lname">ProFFessorTest</span>
-    <span class="ltag">— akademik değerlendirme</span>
+    <span class="ltag">akademisyenleri gerçek ölçütlerle tanı</span>
   </div>
   <div class="nav-tabs">
-    <button class="ntab on" onclick="goPage('analiz',this)">analiz</button>
-    <button class="ntab" onclick="goPage('yorum',this)">değerlendirmeler</button>
+    <button class="ntab on" onclick="goPage('analiz',this)">Ara</button>
+    <button class="ntab" onclick="goPage('yorum',this)">Değerlendir</button>
     <button class="ntab gold" onclick="goPage('admin',this)">
-      admin <span id="admin-badge" style="display:none">0</span>
+      Admin <span id="admin-badge" style="display:none">0</span>
     </button>
   </div>
-  <div class="nav-right"><div class="ndot"></div><span>OpenAlex · ORCID · öğrenci sesi</span></div>
+  <div class="nav-right"><div class="ndot"></div><span>Ücretsiz · açık veri</span></div>
 </nav>
-
-<!-- ═══ DEMO ═══ -->
-<div class="demo-wrap" id="tanitim-section">
-  <div class="demo-header">
-    <div>
-      <div class="demo-label">— nasıl çalışır</div>
-      <div class="demo-title">Dört adımda şeffaf değerlendirme</div>
-    </div>
-    <div class="step-nav">
-      <button class="step-btn on" data-step="0" onclick="goStep(0)">Arama</button>
-      <button class="step-btn" data-step="1" onclick="goStep(1)">Veri</button>
-      <button class="step-btn" data-step="2" onclick="goStep(2)">Öğrenci sesi</button>
-      <button class="step-btn" data-step="3" onclick="goStep(3)">Sonuç</button>
-    </div>
-  </div>
-
-  <div class="demo-body">
-    <div class="dpanel on" id="dp0">
-      <div class="demo-grid">
-        <div>
-          <div class="demo-col-label">Yalnızca iki alan yeterli</div>
-          <div style="margin-bottom:1rem">
-            <label>akademisyen adı</label>
-            <div class="demo-input-mock"><span id="tw-demo"></span><span class="cursor"></span></div>
-          </div>
-          <div>
-            <label>üniversite</label>
-            <div class="demo-input-mock" style="color:var(--ink2)">Boğaziçi Üniversitesi</div>
-          </div>
-        </div>
-        <div>
-          <div class="demo-col-label">Sistem otomatik yapar</div>
-          <div class="demo-info-row"><div class="demo-info-n">01</div><div class="demo-info-v">OpenAlex'ten H-indeksi, atıf ve yayın verisi çeker</div></div>
-          <div class="demo-info-row"><div class="demo-info-n">02</div><div class="demo-info-v">ORCID'den etkinlik, proje, ödül ve hakemlik kayıtlarını çeker</div></div>
-          <div class="demo-info-row"><div class="demo-info-n">03</div><div class="demo-info-v">Öğrenci yorumlarını ağırlıklı skorlar</div></div>
-          <div class="demo-info-row"><div class="demo-info-n">04</div><div class="demo-info-v">Unvan yeterliliği ve kariyer haritası üretir</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="dpanel" id="dp1">
-      <div class="demo-col-label" style="margin-bottom:.75rem">OpenAlex'ten otomatik çekilen veriler</div>
-      <div class="demo-stat-row">
-        <div class="demo-stat"><div class="demo-stat-n">12</div><div class="demo-stat-l">H-indeksi</div></div>
-        <div class="demo-stat"><div class="demo-stat-n">284</div><div class="demo-stat-l">atıf</div></div>
-        <div class="demo-stat"><div class="demo-stat-n">38</div><div class="demo-stat-l">yayın</div></div>
-        <div class="demo-stat"><div class="demo-stat-n">%24</div><div class="demo-stat-l">uluslararası</div></div>
-      </div>
-      <div class="demo-bar-row"><div class="demo-bar-label">araştırma etkisi</div><div class="demo-bar-track"><div class="demo-bar-fill" data-w="70" style="width:0%"></div></div><div class="demo-bar-val">21/30</div></div>
-      <div class="demo-bar-row"><div class="demo-bar-label">yayın kalitesi</div><div class="demo-bar-track"><div class="demo-bar-fill" data-w="55" style="width:0%"></div></div><div class="demo-bar-val">11/20</div></div>
-      <div class="demo-bar-row"><div class="demo-bar-label">uluslararasılık</div><div class="demo-bar-track"><div class="demo-bar-fill" data-w="40" style="width:0%"></div></div><div class="demo-bar-val">6/15</div></div>
-    </div>
-
-    <div class="dpanel" id="dp2">
-      <div class="demo-col-label" style="margin-bottom:.75rem">Topluluk değerlendirmeleri — admin onaylı</div>
-      <div class="demo-yorum">
-        <div class="yr-head">
-          <span class="yr-rol">Öğrenci · 1.0×</span>
-          <span class="yr-status" style="color:var(--moss2)">✓ onaylandı</span>
-        </div>
-        <div class="yr-text">Ders içeriği güncel, konulara hakimiyeti çok iyi. Araştırma odaklı ödevler gerçekten öğretiyor.</div>
-      </div>
-      <div class="demo-yorum pending" id="demo-ap2">
-        <div class="yr-head">
-          <span class="yr-rol">Mezun · 1.2×</span>
-          <span class="yr-status" id="demo-ap2-lbl" style="color:var(--ink3)">◷ admin onayı bekleniyor</span>
-        </div>
-        <div class="yr-text">Doktora sürecimde en çok katkı sağlayan hocalardan biri.</div>
-      </div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);border-left:2px solid var(--line2);padding-left:.75rem;margin-top:.5rem;line-height:1.7">
-        Rol ağırlıkları: meslektaş 1.5× · mezun 1.2× · öğrenci 1.0× · anonim 0.5×
-      </div>
-    </div>
-
-    <div class="dpanel" id="dp3">
-      <div class="demo-grid">
-        <div>
-          <div class="demo-col-label" style="margin-bottom:.75rem">Genel değerlendirme</div>
-          <div style="display:flex;align-items:baseline;gap:.75rem;margin-bottom:1rem">
-            <span style="font-family:var(--serif);font-size:3.2rem;font-weight:400;line-height:1;letter-spacing:-2px;color:var(--ink)">71</span>
-            <span style="font-family:var(--mono);font-size:10px;color:var(--ink3)">/100 · İyi</span>
-          </div>
-          <div class="demo-bar-row"><div class="demo-bar-label">araştırma</div><div class="demo-bar-track"><div class="demo-bar-fill" style="width:70%"></div></div><div class="demo-bar-val">21/30</div></div>
-          <div class="demo-bar-row"><div class="demo-bar-label">yayın kalitesi</div><div class="demo-bar-track"><div class="demo-bar-fill" style="width:55%"></div></div><div class="demo-bar-val">11/20</div></div>
-          <div class="demo-bar-row"><div class="demo-bar-label">öğretim</div><div class="demo-bar-track"><div class="demo-bar-fill" style="width:75%"></div></div><div class="demo-bar-val">15/20</div></div>
-        </div>
-        <div>
-          <div class="demo-unvan">
-            <div>
-              <div class="demo-unvan-label">Unvan yeterliliği</div>
-              <div class="demo-unvan-num">72</div>
-              <div class="demo-unvan-bar"><div class="demo-unvan-fill" style="width:72%"></div></div>
-              <div class="demo-unvan-msg">Prof. Dr. unvanıyla uyumlu.</div>
-            </div>
-            <div style="margin-top:1rem">
-              <div class="demo-unvan-label">Bir sonraki kademe</div>
-              <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:.3rem">En yüksek unvanda.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="demo-footer">
-    <div class="demo-dots" id="d-dots"></div>
-    <div class="demo-progress" id="d-progress">1 / 4</div>
-    <button class="demo-cta" onclick="document.getElementById('analiz-section').scrollIntoView({behavior:'smooth'})">
-      analiz başlat ↓
-    </button>
-  </div>
-</div>
 
 <div class="wrap">
 
-<!-- ═══ HERO ═══ -->
-<div class="hero-wrap">
-  <div class="hero-grid">
-    <div class="hero-left">
-      <div class="hero-no">— 001 / platform</div>
-      <h1>Türk akademisi için<br>şeffaf bir<br>değerlendirme.</h1>
-      <p class="hero-desc">Yayın sayısı değil, gerçek etki. H-indeksi, öğrenci sesi ve unvan uyumu tek platformda.</p>
-      <button class="hero-cta" onclick="document.getElementById('analiz-section').scrollIntoView({behavior:'smooth'})">
-        analiz başlat →
-      </button>
-    </div>
-    <div class="hero-right">
-      <div>
-        <div class="hero-src-title">— veri kaynakları</div>
-        <div class="hero-src-item"><div class="hero-src-n">01</div><div class="hero-src-v">OpenAlex API — H-indeksi, atıf, uluslararası işbirliği</div></div>
-        <div class="hero-src-item"><div class="hero-src-n">02</div><div class="hero-src-v">Topluluk yorumları — admin onaylı, ağırlıklı</div></div>
-        <div class="hero-src-item"><div class="hero-src-n">03</div><div class="hero-src-v">ORCID — etkinlik, proje, ödül, hakemlik</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ ANALİZ ═══ -->
 <div id="pg-analiz" class="page on">
+  <div class="hero">
+    <div class="hero-badge">✓ Ücretsiz · açık veri · doğrulanmış öğrenci yorumları</div>
+    <h1>Bir akademisyeni sadece<br><em>yayın sayısıyla</em> değil, bütünüyle gör.</h1>
+    <p class="hero-desc">Yayın ve atıf verisi, katıldığı etkinlikler, projeler ve öğrencilerinin gerçek deneyimleri tek bir şeffaf puanda.</p>
+  </div>
   <div id="analiz-section">
     <div class="form-section">
-      <div class="section-no">— 002 / analiz</div>
       <div class="section-title">Akademisyen ara</div>
+      <div class="adimlar"><div class="adim"><b>1</b>İsmini yaz</div><div class="adim"><b>2</b>Listeden seç</div><div class="adim"><b>3</b>"Analiz et"e bas</div></div>
       <div class="frow">
-        <div class="ac-wrap"><label>akademisyen adı soyadı</label><input type="text" id="fi" placeholder="Prof. Dr. Kuzey Orhan Kuş" autocomplete="off" oninput="acInput()" onkeydown="acKey(event)" onblur="setTimeout(acHide,180)"><div class="ac-list" id="ac-list"></div><div class="ac-picked" id="ac-picked"></div></div>
-        <div><label>unvan</label>
+        <div class="ac-wrap"><label>akademisyen adı soyadı</label><input type="text" id="fi" placeholder="Ad soyad yazmaya başlayın…" autocomplete="off" oninput="acInput()" onkeydown="acKey(event)" onblur="setTimeout(acHide,180)"><div class="ac-list" id="ac-list"></div><div class="ac-picked" id="ac-picked"></div></div>
+        <div><label>Şu anki unvanı</label>
           <select id="fu">
             <optgroup label="Araştırma Görevlisi"><option>Arş. Gör.</option><option>Arş. Gör. Dr.</option></optgroup>
             <optgroup label="Öğretim Görevlisi"><option>Öğr. Gör.</option><option>Öğr. Gör. Dr.</option></optgroup>
@@ -486,7 +328,7 @@ textarea:focus{border-color:var(--ink)}
         </div>
       </div>
       <div class="frow">
-        <div><label>üniversite</label>
+        <div><label>Üniversite <span class="opt">(seçince kendiliğinden dolar)</span></label>
           <select id="funi">
             <option value="">— seçiniz —</option>
             <optgroup label="Ankara"><option>Ankara Üniversitesi</option><option>Gazi Üniversitesi</option><option>Hacettepe Üniversitesi</option><option>Orta Doğu Teknik Üniversitesi</option><option>Ankara Yıldırım Beyazıt Üniversitesi</option><option>Ankara Hacı Bayram Veli Üniversitesi</option></optgroup>
@@ -495,7 +337,7 @@ textarea:focus{border-color:var(--ink)}
             <optgroup label="Diğer"><option>Akdeniz Üniversitesi</option><option>Anadolu Üniversitesi</option><option>Atatürk Üniversitesi</option><option>Bursa Uludağ Üniversitesi</option><option>Çukurova Üniversitesi</option><option>Dicle Üniversitesi</option><option>Erciyes Üniversitesi</option><option>Eskişehir Teknik Üniversitesi</option><option>Eskişehir Osmangazi Üniversitesi</option><option>Fırat Üniversitesi</option><option>Gaziantep Üniversitesi</option><option>Gebze Teknik Üniversitesi</option><option>İnönü Üniversitesi</option><option>Karadeniz Teknik Üniversitesi</option><option>Kocaeli Üniversitesi</option><option>Konya Teknik Üniversitesi</option><option>Mersin Üniversitesi</option><option>Muğla Sıtkı Koçman Üniversitesi</option><option>Ondokuz Mayıs Üniversitesi</option><option>Pamukkale Üniversitesi</option><option>Sakarya Üniversitesi</option><option>Selçuk Üniversitesi</option><option>Sivas Cumhuriyet Üniversitesi</option><option>Süleyman Demirel Üniversitesi</option><option>TOBB Ekonomi ve Teknoloji Üniversitesi</option><option>Trakya Üniversitesi</option><option>Van Yüzüncü Yıl Üniversitesi</option><option>Yozgat Bozok Üniversitesi</option><option>Zonguldak Bülent Ecevit Üniversitesi</option></optgroup>
           </select>
         </div>
-        <div><label>bölüm</label>
+        <div><label>Bölüm <span class="opt">(isteğe bağlı)</span></label>
           <select id="fbol">
             <option value="">— seçiniz —</option>
             <optgroup label="Mühendislik"><option>Bilgisayar Mühendisliği</option><option>Elektrik-Elektronik Mühendisliği</option><option>Makine Mühendisliği</option><option>İnşaat Mühendisliği</option><option>Endüstri Mühendisliği</option><option>Yazılım Mühendisliği</option><option>Biyomedikal Mühendisliği</option></optgroup>
@@ -507,9 +349,9 @@ textarea:focus{border-color:var(--ink)}
           </select>
         </div>
       </div>
-      <div class="form-note">— isim yazdıkça Türkiye'deki eşleşen akademisyenler listelenir. H-indeksi, atıf ve yayın verileri OpenAlex'ten, etkinlik, görev, ödül ve projeler ORCID'den otomatik çekilir</div>
+      <div class="form-note">İpucu: 3 harf yazınca Türkiye'deki eşleşen akademisyenler çıkar. Doğru kişiyi üniversitesinden tanıyabilirsiniz.</div>
       <div class="errbx" id="a-err"></div>
-      <button class="btn primary btn-full" id="sbtn" onclick="baslat()" style="margin-top:1rem">analiz başlat</button>
+      <button class="btn primary btn-full" id="sbtn" onclick="baslat()" style="margin-top:1rem">Analiz et</button>
     </div>
 
     <div class="prog" id="prog">
@@ -526,7 +368,7 @@ textarea:focus{border-color:var(--ink)}
     </div>
 
     <div class="datapanel" id="datapanel">
-      <div class="section-no">— ham veriler <span id="dpSrc"></span></div>
+      <div class="section-no">Ham veriler <span id="dpSrc"></span></div>
       <div class="dpgrid" id="dpgrid"></div>
       <div class="dpgrid2" id="dpgrid2"></div>
       <div class="orcid-row" id="orcidrow" style="display:none"></div>
@@ -548,17 +390,26 @@ textarea:focus{border-color:var(--ink)}
       </div>
       <div class="ucards" id="rucards"></div>
       <div class="bulg-wrap">
-        <div class="section-no">— bulgular</div>
+        <div class="section-no">Bulgular</div>
         <div id="rbulg" style="margin-top:.75rem"></div>
       </div>
       <div class="anal-wrap">
-        <div class="section-no">— detaylı analiz</div>
+        <div class="section-no">Detaylı döküm</div>
         <div class="rawtext" id="ranaliz" style="margin-top:.75rem"></div>
         <div class="disc">* Puan sabit ve açık bir formülle hesaplanır: araştırma ve yayın verileri OpenAlex'ten, etkinlik, proje ve hizmetler ORCID'den, öğretim puanı onaylı öğrenci/mezun değerlendirmelerinden gelir. Verisi olmayan boyut puana katılmaz. Unvan eşikleri yaklaşıktır ve alanlar arası farkları yansıtmaz. Resmi değerlendirme belgesi değildir.</div>
       </div>
       <div style="padding-top:1.5rem;border-top:1px solid var(--line);margin-top:.5rem">
-        <button class="btn" onclick="goToYorum()">değerlendirme yaz →</button>
+        <button class="btn" onclick="goToYorum()">Bu hocayı değerlendir →</button>
       </div>
+    </div>
+  </div>
+  <div class="how">
+    <div class="section-title">Puan nasıl hesaplanır?</div>
+    <div class="how-grid">
+      <div class="how-item"><div class="how-n">1</div><div class="how-t">Yayın ve atıf</div><div class="how-d">H-indeksi, atıf ve güncel yayınlar OpenAlex'ten gelir. Toplam puanın sadece bir kısmıdır.</div></div>
+      <div class="how-item"><div class="how-n">2</div><div class="how-t">Etkinlik ve projeler</div><div class="how-d">Görevler, ödüller, projeler ve hakemlikler ORCID'den çekilir.</div></div>
+      <div class="how-item"><div class="how-n">3</div><div class="how-t">Öğrenci sesi</div><div class="how-d">Okul e-postasıyla doğrulanmış, admin onaylı öğrenci ve mezun yorumları.</div></div>
+      <div class="how-item"><div class="how-n">4</div><div class="how-t">Şeffaf sonuç</div><div class="how-d">Açık bir formül. Verisi olmayan alan puana katılmaz, aynı hoca hep aynı puanı alır.</div></div>
     </div>
   </div>
 </div>
@@ -566,9 +417,9 @@ textarea:focus{border-color:var(--ink)}
 <!-- ═══ YORUM ═══ -->
 <div id="pg-yorum" class="page">
   <div class="form-section">
-    <div class="section-no">— 003 / değerlendirmeler</div>
-    <div class="section-title">Akademisyen seç</div>
-    <label>değerlendirmek istediğiniz akademisyen</label>
+    <div class="section-title">Kimi değerlendirmek istiyorsunuz?</div>
+    <div class="adimlar"><div class="adim"><b>1</b>Hocayı seç</div><div class="adim"><b>2</b>Yıldız ver, yorum yaz</div><div class="adim"><b>3</b>Okul e-postanı doğrula, gönder</div></div>
+    <label>Akademisyen <span class="opt">(listede yoksa aşağıdan ekleyin)</span></label>
     <select id="sel-hoca" onchange="loadProfil()" style="margin-bottom:1rem"></select>
     <div class="add-hoca-row">
       <div><label>yeni akademisyen ekle</label><input type="text" id="yeni-isim" placeholder="Ad soyad"></div>
@@ -581,7 +432,7 @@ textarea:focus{border-color:var(--ink)}
           <optgroup label="Diğer"><option>Akdeniz Üniversitesi</option><option>Anadolu Üniversitesi</option><option>Atatürk Üniversitesi</option><option>Bursa Uludağ Üniversitesi</option><option>Çukurova Üniversitesi</option><option>Dicle Üniversitesi</option><option>Erciyes Üniversitesi</option><option>Eskişehir Teknik Üniversitesi</option><option>Eskişehir Osmangazi Üniversitesi</option><option>Fırat Üniversitesi</option><option>Gaziantep Üniversitesi</option><option>Gebze Teknik Üniversitesi</option><option>İnönü Üniversitesi</option><option>Karadeniz Teknik Üniversitesi</option><option>Kocaeli Üniversitesi</option><option>Konya Teknik Üniversitesi</option><option>Mersin Üniversitesi</option><option>Muğla Sıtkı Koçman Üniversitesi</option><option>Ondokuz Mayıs Üniversitesi</option><option>Pamukkale Üniversitesi</option><option>Sakarya Üniversitesi</option><option>Selçuk Üniversitesi</option><option>Sivas Cumhuriyet Üniversitesi</option><option>Süleyman Demirel Üniversitesi</option><option>TOBB Ekonomi ve Teknoloji Üniversitesi</option><option>Trakya Üniversitesi</option><option>Van Yüzüncü Yıl Üniversitesi</option><option>Yozgat Bozok Üniversitesi</option><option>Zonguldak Bülent Ecevit Üniversitesi</option></optgroup>
         </select>
       </div>
-      <button class="btn" onclick="hocaEkle()" style="align-self:flex-end">+ ekle</button>
+      <button class="btn" onclick="hocaEkle()" style="align-self:flex-end">+ Ekle</button>
     </div>
   </div>
 
@@ -599,7 +450,7 @@ textarea:focus{border-color:var(--ink)}
     </div>
 
     <div class="form-section">
-      <div class="section-no">— değerlendirme yaz</div>
+      <div class="section-title">Değerlendirme yaz</div>
       <label style="margin-bottom:.5rem">rolünüz <span style="color:var(--ink4)">(puan ağırlığını belirler · yorumlar her zaman anonim yayınlanır)</span></label>
       <div class="rol-grid">
         <div class="rol-btn on" data-rol="ogrenci" onclick="secRol(this)">Öğrenci<div class="rol-weight">1.0×</div></div>
@@ -621,7 +472,7 @@ textarea:focus{border-color:var(--ink)}
       <div style="margin-bottom:1rem"><label>yorumunuz</label><textarea id="yorum-text" placeholder="Dersin verimini, hocanın tutumunu, güçlü ve zayıf yanlarını yazın. Kişisel saldırı içeren yorumlar onaylanmaz."></textarea></div>
       <div class="auth-box" id="auth-box"></div>
       <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-        <button class="btn primary" id="yorum-btn" onclick="yorumGonder()">gönder</button>
+        <button class="btn primary" id="yorum-btn" onclick="yorumGonder()">Değerlendirmeyi gönder</button>
         <span style="font-family:var(--mono);font-size:10px;color:var(--ink3)">admin onayı sonrası yayınlanır</span>
       </div>
       <div class="toast" id="toast">✓ Değerlendirmeniz alındı. Admin onayı bekleniyor.</div>
@@ -629,7 +480,7 @@ textarea:focus{border-color:var(--ink)}
     </div>
 
     <div style="padding:1.5rem 0">
-      <div class="section-no">— onaylanmış değerlendirmeler <span id="yorum-count"></span></div>
+      <div class="section-title" style="margin-bottom:.5rem">Onaylanmış değerlendirmeler <span id="yorum-count"></span></div>
       <div id="yorum-liste" style="margin-top:.75rem"><div class="loading"><span class="spin">◐</span> yükleniyor</div></div>
     </div>
   </div>
@@ -638,33 +489,33 @@ textarea:focus{border-color:var(--ink)}
 <!-- ═══ ADMİN ═══ -->
 <div id="pg-admin" class="page">
   <div class="admin-login" id="admin-login">
-    <h3>&#9702; Admin girişi</h3>
+    <h3>Admin girişi</h3>
     <div id="admin-sb" style="display:none">
       <div style="margin-bottom:1rem"><label>admin e-posta adresi</label><input type="email" id="admin-email" placeholder="ornek@gmail.com" onkeydown="if(event.key==='Enter')adminLogin()"></div>
       <div class="errbx" id="login-err" style="display:none"></div>
-      <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem">giriş linki gönder</button>
+      <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem">Giriş linki gönder</button>
       <div class="auth-note" id="admin-note">Adrese tek kullanımlık giriş linki gönderilir. Sadece admin listesindeki adresler paneli açabilir.</div>
     </div>
     <div id="admin-demo">
       <div style="margin-bottom:1rem"><label>şifre</label><input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
       <div class="errbx" id="login-err-demo" style="display:none">Hatalı şifre.</div>
-      <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem">giriş yap</button>
+      <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem">Giriş yap</button>
       <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.75rem">demo modu (veritabanı bağlı değil, veriler sadece bu tarayıcıda) · şifre: <code style="background:var(--paper2);padding:1px 5px">admin123</code></div>
     </div>
   </div>
   <div class="admin-panel" id="admin-panel">
     <div style="display:flex;align-items:baseline;justify-content:space-between;padding:1.5rem 0;border-bottom:1px solid var(--line);margin-bottom:1.5rem">
       <div class="section-title">Admin paneli</div>
-      <button class="btn danger" onclick="adminLogout()">çıkış</button>
+      <button class="btn danger" onclick="adminLogout()">Çıkış</button>
     </div>
     <div class="admin-stats">
       <div class="astat"><div class="astat-val" id="stat-b" style="color:var(--warn)">—</div><div class="astat-lbl">bekleyen</div></div>
       <div class="astat"><div class="astat-val" id="stat-o" style="color:var(--moss2)">—</div><div class="astat-lbl">onaylanan</div></div>
       <div class="astat"><div class="astat-val" id="stat-r" style="color:var(--danger)">—</div><div class="astat-lbl">reddedilen</div></div>
     </div>
-    <div class="section-no" style="margin-bottom:1rem">— onay kuyruğu</div>
+    <div class="section-no" style="margin-bottom:1rem">Onay kuyruğu</div>
     <div id="kuyruk-liste"><div class="loading"><span class="spin">◐</span> yükleniyor</div></div>
-    <div class="section-no" style="margin-top:1.5rem;margin-bottom:1rem">— onaylananlar</div>
+    <div class="section-no" style="margin-top:1.5rem;margin-bottom:1rem">Onaylananlar</div>
     <div id="onaylanan-liste"><div class="loading"><span class="spin">◐</span> yükleniyor</div></div>
   </div>
 </div>
@@ -698,59 +549,6 @@ var BASAMAK=['Arş. Gör.','Arş. Gör. Dr.','Öğr. Gör.','Öğr. Gör. Dr.','
 var DIMTR={Arastirma:'araştırma etkisi',Yayin:'güncel yayın',Ogretim:'öğretim (öğrenci sesi)',Uluslararasi:'uluslararasılık',Etkinlik:'etkinlik, proje ve hizmet',Etik:'etik bütünlük'};
 var GRC={VeriAz:'var(--ink3)',Mukemmel:'var(--moss2)',Iyi:'var(--ink)',Orta:'var(--warn)',Yetersiz:'var(--danger)',Kritik:'var(--danger)'};
 var GRTR={VeriAz:'yetersiz veri',Mukemmel:'mükemmel',Iyi:'iyi',Orta:'orta',Yetersiz:'yetersiz',Kritik:'kritik'};
-
-/* ══ DEMO OTOMATİK DÖNGÜ ══ */
-(function(){
-  var cur=0,total=4,autoT=null,MS=3500;
-  function dots(){
-    var el=document.getElementById('d-dots');
-    if(!el)return;
-    el.innerHTML='';
-    for(var i=0;i<total;i++){
-      var d=document.createElement('div');
-      d.className='d-dot'+(i===cur?' on':'');
-      (function(n){d.onclick=function(){goStep(n);};})(i);
-      el.appendChild(d);
-    }
-    var p=document.getElementById('d-progress');
-    if(p) p.textContent=(cur+1)+' / '+total;
-  }
-  function render(){
-    for(var i=0;i<total;i++){
-      var p=document.getElementById('dp'+i);
-      var b=document.querySelector('.step-btn[data-step="'+i+'"]');
-      if(p) p.classList.toggle('on',i===cur);
-      if(b) b.classList.toggle('on',i===cur);
-    }
-    dots();
-    if(cur===0){
-      var tw=document.getElementById('tw-demo');
-      if(tw){tw.textContent='';var txt='Prof. Dr. Kuzey Orhan Kuş',idx=0;
-        var ti=setInterval(function(){if(idx<txt.length)tw.textContent+=txt[idx++];else clearInterval(ti);},55);}
-    }
-    if(cur===1){
-      setTimeout(function(){
-        document.querySelectorAll('#dp1 .demo-bar-fill').forEach(function(b){
-          var w=b.dataset.w;b.style.width='0%';
-          setTimeout(function(){b.style.width=w+'%';},60);
-        });
-      },50);
-    }
-    if(cur===2){
-      var ap2=document.getElementById('demo-ap2');
-      var lbl=document.getElementById('demo-ap2-lbl');
-      if(ap2) ap2.style.opacity='.5';
-      setTimeout(function(){
-        if(ap2){ap2.style.opacity='1';ap2.style.borderLeftColor='var(--moss2)';ap2.classList.remove('pending');}
-        if(lbl){lbl.style.color='var(--moss2)';lbl.textContent='✓ onaylandı';}
-      },1200);
-    }
-  }
-  function start(){stop();autoT=setInterval(function(){cur=(cur+1)%total;render();},MS);}
-  function stop(){if(autoT){clearInterval(autoT);autoT=null;}}
-  window.goStep=function(n){cur=n;stop();render();start();};
-  render();start();
-})();
 
 /* ══ SAYFA ══ */
 function goPage(id,btn){
@@ -848,12 +646,12 @@ function renderAuthBox(){
   if(!SB_READY){el.innerHTML='<div class="auth-note">Demo modu: veritabanı bağlı değil, değerlendirmeler sadece bu tarayıcıda saklanır ve doğrulama yapılmaz.</div>';return;}
   if(SESSION){
     var em=SESSION.user.email||'';
-    el.innerHTML='<div class="auth-ok">✓ doğrulandı: '+escH(em)+'<button class="linkbtn" onclick="cikisYap()">çıkış</button></div>'+
+    el.innerHTML='<div class="auth-ok">✓ doğrulandı: '+escH(em)+'<button class="linkbtn" onclick="cikisYap()">Çıkış</button></div>'+
       (/\.edu\.tr$/i.test(em)?'':'<div class="auth-note">Bu adres okul e-postası değil; yalnızca mezun rolüyle ve barkod numarasıyla değerlendirme yazabilirsiniz.</div>');
     return;
   }
   el.innerHTML='<div>Değerlendirme yazmak için <b>okul e-postanızı</b> doğrulayın.</div>'+
-    '<div class="auth-row"><input type="email" id="auth-email" placeholder="ad.soyad@ogr.universite.edu.tr" onkeydown="if(event.key===\'Enter\')linkGonder()"><button class="btn" onclick="linkGonder()">doğrulama linki gönder</button></div>'+
+    '<div class="auth-row"><input type="email" id="auth-email" placeholder="ad.soyad@ogr.universite.edu.tr" onkeydown="if(event.key===\'Enter\')linkGonder()"><button class="btn primary" onclick="linkGonder()">Doğrulama linki gönder</button></div>'+
     '<div class="auth-note" id="auth-msg">Sadece .edu.tr adresleri kabul edilir (mezunlar başka adres + barkod kullanabilir). E-postanız yayınlanmaz, yorumunuz anonim görünür.</div>';
 }
 function linkGonder(){
@@ -904,7 +702,7 @@ function hesaplaPuan(yorumlar){
     Object.keys(cT).forEach(function(k){if(cats[k]){cT[k]+=cats[k]*w;cC[k]+=w;}});});
   var gen=tW>0?tG/tW:0;
   var cats={};Object.keys(cT).forEach(function(k){cats[k]=cC[k]>0?Math.round(cT[k]/cC[k]*10)/10:null;});
-  return{genel:Math.round(gen*10)/10,ogretim:Math.round(gen/5*20),cats:cats,count:yorumlar.length};
+  return{genel:Math.round(gen*10)/10,ogretim:Math.round(gen/5*25),cats:cats,count:yorumlar.length};
 }
 
 /* ══ BADGE ══ */
@@ -966,7 +764,7 @@ function renderProfilScore(list){
   if(puan){
     var gc=puan.genel>=4?'var(--moss2)':puan.genel>=3?'var(--warn)':'var(--danger)';
     sr.innerHTML='<div class="score-pill"><div class="sp-val" style="color:'+gc+'">'+puan.genel.toFixed(1)+'/5</div><div class="sp-lbl">genel</div></div>'+
-      '<div class="score-pill"><div class="sp-val">'+puan.ogretim+'/20</div><div class="sp-lbl">öğretim skoru</div></div>'+
+      '<div class="score-pill"><div class="sp-val">'+puan.ogretim+'/25</div><div class="sp-lbl">öğretim puanı</div></div>'+
       '<div class="score-pill"><div class="sp-val" style="color:var(--ink2)">'+puan.count+'</div><div class="sp-lbl">onaylı yorum</div></div>'+
       (puan.cats?Object.keys(puan.cats).filter(function(k){return puan.cats[k];}).map(function(k){return'<div class="score-pill"><div class="sp-val">'+puan.cats[k].toFixed(1)+'/5</div><div class="sp-lbl">'+CAT_LBL[k].toLowerCase()+'</div></div>';}).join(''):'');
   }else{
@@ -1284,7 +1082,7 @@ function showDataPanel(d){
       stat('H-indeksi',d.h_index,'',d.h_index>=10?'var(--moss2)':d.h_index>=5?'var(--warn)':'var(--danger)')+
       stat('Toplam atıf',d.cited_by_count.toLocaleString('tr'),'')+
       stat('Toplam yayın',d.works_count,'')+
-      stat('i10-indeks',d.i10_index,'10+ atıf alan');
+      stat('10+ atıflı yayın',d.i10_index,'i10-indeksi');
     document.getElementById('dpgrid2').innerHTML=
       stat('Son 3 yıl',d.recent_works,'yayın',d.recent_works>=3?'var(--moss2)':d.recent_works>=1?'var(--warn)':'var(--danger)')+
       stat('Uluslararası','%'+d.intl_collab_pct,'ortak yazar',d.intl_collab_pct>=20?'var(--moss2)':d.intl_collab_pct>=5?'var(--warn)':'var(--danger)')+
