@@ -297,7 +297,7 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
   <div class="nav-tabs">
     <button class="ntab on" onclick="goPage('analiz',this)">Ara</button>
     <button class="ntab" onclick="goPage('yorum',this)">Değerlendir</button>
-    <button class="ntab gold" onclick="goPage('admin',this)">
+    <button class="ntab gold" id="admin-tab" style="display:none" onclick="goPage('admin',this)">
       Admin <span id="admin-badge" style="display:none">0</span>
     </button>
   </div>
@@ -836,6 +836,8 @@ function yorumGonder(){
 
 /* ══ ADMİN ══ */
 function adminUI(){
+  // Admin sekmesi menüde yalnızca giriş yapmış admine görünür; giriş sayfası ?sayfa=admin ile açılır.
+  document.getElementById('admin-tab').style.display=(SB_READY&&SESSION&&IS_ADMIN)?'':'none';
   document.getElementById('admin-sb').style.display=SB_READY?'block':'none';
   document.getElementById('admin-demo').style.display=SB_READY?'none':'block';
   if(!SB_READY)return;
@@ -862,7 +864,7 @@ function adminLogin(){
   });
 }
 function adminLogout(){
-  if(SB_READY){SB.auth.signOut();return;}
+  if(SB_READY){SB.auth.signOut();goPage('analiz',document.querySelector('.ntab'));return;}
   document.getElementById('admin-panel').classList.remove('on');document.getElementById('admin-login').style.display='block';document.getElementById('admin-pw').value='';
 }
 function renderAdmin(){
