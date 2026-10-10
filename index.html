@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -238,7 +239,7 @@ textarea:focus{border-color:var(--ink)}
 .sp-val{font-family:var(--serif);font-size:1.4rem;font-weight:400;line-height:1;color:var(--ink)}
 .sp-lbl{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px;text-transform:lowercase}
 .impact-note{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:.75rem;padding:.55rem .85rem;border-left:2px solid var(--line2);line-height:1.6}
-.rol-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:1rem}
+.rol-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:1rem}
 .rol-btn{background:transparent;border:1px solid var(--line);padding:.4rem;font-family:var(--mono);font-size:11px;color:var(--ink3);cursor:pointer;text-align:center;transition:all .12s;text-transform:lowercase;border-radius:3px}
 .rol-btn:hover{color:var(--ink2);border-color:var(--line2)}
 .rol-btn.on{border-color:var(--ink);color:var(--ink)}
@@ -254,6 +255,12 @@ textarea:focus{border-color:var(--ink)}
 .cat-star.on{color:var(--ink)}
 .toast{display:none;border-left:2px solid var(--moss2);padding:.65rem 1rem;font-family:var(--mono);font-size:11px;color:var(--moss2);margin-top:.7rem;align-items:center;gap:7px}
 .toast.on{display:flex}
+.auth-box{border:1px solid var(--line);padding:.85rem 1rem;margin-bottom:1rem;font-size:12.5px;color:var(--ink2)}
+.auth-box .auth-ok{font-family:var(--mono);font-size:11px;color:var(--moss2)}
+.auth-box .auth-row{display:flex;gap:.6rem;align-items:flex-end;margin-top:.5rem}
+.auth-box .auth-row input{flex:1}
+.auth-note{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.45rem;line-height:1.6}
+.linkbtn{background:none;border:none;color:var(--ink3);font-family:var(--mono);font-size:10px;text-decoration:underline;cursor:pointer;padding:0;margin-left:.5rem}
 .yorum-item{padding:.85rem 0;border-bottom:1px solid var(--line)}
 .yorum-item:last-child{border-bottom:none}
 .yi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
@@ -588,17 +595,16 @@ textarea:focus{border-color:var(--ink)}
         </div>
       </div>
       <div class="score-row" id="ph-score"></div>
-      <div class="impact-note">Öğretim puanı onaylı yorumların ağırlıklı ortalamasından hesaplanır. Her yorum admin onayından geçer.</div>
+      <div class="impact-note">Öğretim puanı, okul e-postasıyla doğrulanmış ve admin onayından geçmiş yorumların ağırlıklı ortalamasıdır. Puan en az 3 onaylı yorumdan sonra gösterilir. Her hesap bir hocaya yalnızca bir kez yorum yazabilir.</div>
     </div>
 
     <div class="form-section">
       <div class="section-no">— değerlendirme yaz</div>
-      <label style="margin-bottom:.5rem">rolünüz <span style="color:var(--ink4)">(puan ağırlığını belirler)</span></label>
+      <label style="margin-bottom:.5rem">rolünüz <span style="color:var(--ink4)">(puan ağırlığını belirler · yorumlar her zaman anonim yayınlanır)</span></label>
       <div class="rol-grid">
         <div class="rol-btn on" data-rol="ogrenci" onclick="secRol(this)">Öğrenci<div class="rol-weight">1.0×</div></div>
         <div class="rol-btn" data-rol="mezun" onclick="secRol(this)">Mezun<div class="rol-weight">1.2×</div></div>
         <div class="rol-btn" data-rol="meslektas" onclick="secRol(this)">Meslektaş<div class="rol-weight">1.5×</div></div>
-        <div class="rol-btn" data-rol="anonim" onclick="secRol(this)">Anonim<div class="rol-weight">0.5×</div></div>
       </div>
       <div class="frow">
         <div><label>genel puan</label><div class="star-row" id="genel-stars"><span class="star" onclick="starTik(1)">★</span><span class="star" onclick="starTik(2)">★</span><span class="star" onclick="starTik(3)">★</span><span class="star" onclick="starTik(4)">★</span><span class="star" onclick="starTik(5)">★</span></div></div>
@@ -611,9 +617,11 @@ textarea:focus{border-color:var(--ink)}
         <div class="cat-item"><span class="cat-lbl">güncel içerik</span><div class="cat-stars" data-cat="guncel"></div></div>
         <div class="cat-item"><span class="cat-lbl">sınav adaleti</span><div class="cat-stars" data-cat="adalet"></div></div>
       </div>
+      <div id="barkod-alani" style="display:none;margin-bottom:1rem"><label>mezuniyet belgesi barkod numarası <span style="color:var(--ink4)">(e-Devlet → Mezun Belgesi Sorgulama; admin doğrular, yayınlanmaz)</span></label><input type="text" id="barkod" placeholder="Örn. YOK3A1B2C3D4E5F6" maxlength="40"></div>
       <div style="margin-bottom:1rem"><label>yorumunuz</label><textarea id="yorum-text" placeholder="Dersin verimini, hocanın tutumunu, güçlü ve zayıf yanlarını yazın. Kişisel saldırı içeren yorumlar onaylanmaz."></textarea></div>
+      <div class="auth-box" id="auth-box"></div>
       <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-        <button class="btn primary" onclick="yorumGonder()">gönder</button>
+        <button class="btn primary" id="yorum-btn" onclick="yorumGonder()">gönder</button>
         <span style="font-family:var(--mono);font-size:10px;color:var(--ink3)">admin onayı sonrası yayınlanır</span>
       </div>
       <div class="toast" id="toast">✓ Değerlendirmeniz alındı. Admin onayı bekleniyor.</div>
@@ -631,10 +639,18 @@ textarea:focus{border-color:var(--ink)}
 <div id="pg-admin" class="page">
   <div class="admin-login" id="admin-login">
     <h3>&#9702; Admin girişi</h3>
-    <div style="margin-bottom:1rem"><label>şifre</label><input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
-    <div class="errbx" id="login-err" style="display:none">Hatalı şifre.</div>
-    <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem">giriş yap</button>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.75rem">demo şifre: <code style="background:var(--paper2);padding:1px 5px">admin123</code></div>
+    <div id="admin-sb" style="display:none">
+      <div style="margin-bottom:1rem"><label>admin e-posta adresi</label><input type="email" id="admin-email" placeholder="ornek@gmail.com" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <div class="errbx" id="login-err" style="display:none"></div>
+      <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem">giriş linki gönder</button>
+      <div class="auth-note" id="admin-note">Adrese tek kullanımlık giriş linki gönderilir. Sadece admin listesindeki adresler paneli açabilir.</div>
+    </div>
+    <div id="admin-demo">
+      <div style="margin-bottom:1rem"><label>şifre</label><input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <div class="errbx" id="login-err-demo" style="display:none">Hatalı şifre.</div>
+      <button class="btn primary btn-full" onclick="adminLogin()" style="margin-top:.75rem">giriş yap</button>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:.75rem">demo modu (veritabanı bağlı değil, veriler sadece bu tarayıcıda) · şifre: <code style="background:var(--paper2);padding:1px 5px">admin123</code></div>
+    </div>
   </div>
   <div class="admin-panel" id="admin-panel">
     <div style="display:flex;align-items:baseline;justify-content:space-between;padding:1.5rem 0;border-bottom:1px solid var(--line);margin-bottom:1.5rem">
@@ -657,21 +673,24 @@ textarea:focus{border-color:var(--ink)}
 
 <script>
 /* ══ AYARLAR ══ */
-var SUPABASE_URL      = 'BURAYA_SUPABASE_URL';
-var SUPABASE_ANON_KEY = 'BURAYA_SUPABASE_ANON_KEY';
+var SUPABASE_URL      = 'https://kltcmwgabefjwbrftldk.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsdGNtd2dhYmVmandicmZ0bGRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NDMxNzksImV4cCI6MjEwNzIxOTE3OX0.LfKadwD7rgv9n7iT5Hk_2vWyY0WDI6_LrdzHF4sCY7I';
 var ADMIN_PW          = 'admin123';
 var EJS_PUBLIC_KEY    = 'BURAYA_EJS_PUBLIC_KEY';
 var EJS_SERVICE_ID    = 'BURAYA_EJS_SERVICE_ID';
 var EJS_ADMIN_TPL     = 'BURAYA_EJS_ADMIN_TPL';
 var ADMIN_EMAIL       = 'BURAYA_ADMIN_EMAIL';
 
-var SB_READY   = SUPABASE_URL !== 'BURAYA_SUPABASE_URL';
+var SB_READY   = SUPABASE_URL !== 'BURAYA_SUPABASE_URL' && !!window.supabase;
+var SB = SB_READY ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+var MIN_YORUM = 3;          // öğretim puanı bu kadar onaylı yorumdan sonra gösterilir
+var SESSION = null, IS_ADMIN = false;
 
 /* ══ STATE ══ */
 var TID=null, SEL_ROL='ogrenci', GENEL_STAR=0, SEL_AUTHOR=null;
 var CAT_STARS={ders:0,ulasim:0,guncel:0,adalet:0};
 var CAT_LBL={ders:'Ders anlatımı',ulasim:'Ulaşılabilirlik',guncel:'Güncel içerik',adalet:'Sınav adaleti'};
-var ROL_W={ogrenci:1.0,mezun:1.2,meslektas:1.5,anonim:0.5};
+var ROL_W={ogrenci:1.0,mezun:1.2,meslektas:1.5,anonim:0.5};  // anonim: eski yorumlar için
 var ROL_LBL={ogrenci:'Öğrenci',mezun:'Mezun',meslektas:'Meslektaş',anonim:'Anonim'};
 var ROL_BG={ogrenci:'rgba(26,122,80,.1)',mezun:'rgba(40,160,106,.1)',meslektas:'rgba(100,80,180,.1)',anonim:'rgba(100,100,100,.1)'};
 var ROL_C={ogrenci:'var(--moss)',mezun:'var(--moss2)',meslektas:'#6450b4',anonim:'var(--ink3)'};
@@ -762,19 +781,10 @@ function getDB(){initDB();return _MEM;}
 function saveDB(db){_MEM=db;_lsSet(db);}
 
 /* ══ SUPABASE HELPERS ══ */
-function sbFetch(path,opts){
-  return fetch(SUPABASE_URL+'/rest/v1/'+path,Object.assign({
-    headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
-  },opts||{}));
-}
-
-/* ══ HOCALAR ══ */
+function sbErr(e){return e&&e.message?e.message:'bağlantı hatası';}
 function getHocalar(cb){
   if(!SB_READY){cb(getDB().hocalar);return;}
-  sbFetch('hocalar?order=isim.asc',{method:'GET'})
-    .then(function(r){return r.json();})
-    .then(function(d){cb(Array.isArray(d)?d:[]);})
-    .catch(function(){cb(getDB().hocalar);});
+  SB.from('hocalar').select('*').order('isim').then(function(r){cb(r.data||[]);});
 }
 function insertHoca(isim,uni,cb){
   var id='h_'+Date.now();
@@ -784,15 +794,11 @@ function insertHoca(isim,uni,cb){
     if(ex){cb(ex,null);return;}
     db.hocalar.push({id:id,isim:isim,uni:uni});saveDB(db);cb({id:id,isim:isim,uni:uni},null);return;
   }
-  sbFetch('hocalar?isim=eq.'+encodeURIComponent(isim)+'&limit=1',{method:'GET'})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(Array.isArray(d)&&d.length>0){cb(d[0],null);return;}
-      sbFetch('hocalar',{method:'POST',body:JSON.stringify({id:id,isim:isim,uni:uni})})
-        .then(function(r2){return r2.json();})
-        .then(function(d2){cb(Array.isArray(d2)?d2[0]:d2,null);})
-        .catch(function(e){cb({id:id,isim:isim,uni:uni},null);});
-    }).catch(function(){cb({id:id,isim:isim,uni:uni},null);});
+  SB.from('hocalar').select('*').ilike('isim',isim).limit(1).then(function(r){
+    if(r.data&&r.data.length){cb(r.data[0],null);return;}
+    var row={id:id,isim:isim,uni:uni};
+    SB.from('hocalar').insert(row).then(function(r2){cb(r2.error?null:row,r2.error?sbErr(r2.error):null);});
+  });
 }
 function upsertHoca(isim,uni,cb){insertHoca(isim,uni,cb);}
 
@@ -801,31 +807,30 @@ function getYorumlar(hocaId,durum,cb){
   if(!SB_READY){
     cb(getDB().yorumlar.filter(function(y){return y.hoca_id===hocaId&&(!durum||y.durum===durum);}));return;
   }
-  var q='hoca_id=eq.'+hocaId+(durum?'&durum=eq.'+durum:'')+'&order=created_at.desc';
-  sbFetch('yorumlar?'+q,{method:'GET'})
-    .then(function(r){return r.json();})
-    .then(function(d){cb(Array.isArray(d)?d:[]);})
-    .catch(function(){cb([]);});
+  var q=durum==='onaylandi'?SB.from('yorumlar_public').select('*'):SB.from('yorumlar').select('*');
+  q=q.eq('hoca_id',hocaId);if(durum&&durum!=='onaylandi')q=q.eq('durum',durum);
+  q.order('created_at',{ascending:false}).then(function(r){cb(r.data||[]);});
 }
 function getAllYorumlar(durum,cb){
   if(!SB_READY){
     cb(getDB().yorumlar.filter(function(y){return !durum||y.durum===durum;}));return;
   }
-  var q=(durum?'durum=eq.'+durum+'&':'')+'order=created_at.desc';
-  sbFetch('yorumlar?'+q,{method:'GET'})
-    .then(function(r){return r.json();})
-    .then(function(d){cb(Array.isArray(d)?d:[]);})
-    .catch(function(){cb([]);});
+  if(!IS_ADMIN){cb([]);return;}
+  var q=SB.from('yorumlar').select('*');if(durum)q=q.eq('durum',durum);
+  q.order('created_at',{ascending:false}).then(function(r){cb(r.data||[]);});
 }
 function insertYorum(y,cb){
-  var row={id:y.id,hoca_id:y.hocaId,rol:y.rol,genel:y.genel,cats:y.cats,metin:y.text,donem:y.donem,durum:'bekleyen',agirlik:y.agirlik,tarih:y.tarih};
+  var row={id:y.id,hoca_id:y.hocaId,rol:y.rol,genel:y.genel,cats:y.cats,metin:y.text,donem:y.donem||null,durum:'bekleyen',agirlik:y.agirlik,tarih:y.tarih};
+  if(y.barkod)row.barkod=y.barkod;
   if(!SB_READY){
     var db=getDB();db.yorumlar.push(row);saveDB(db);cb({},null);return;
   }
-  sbFetch('yorumlar',{method:'POST',body:JSON.stringify(row)})
-    .then(function(r){return r.json();})
-    .then(function(d){cb(d,null);})
-    .catch(function(e){cb(null,e.message);});
+  SB.from('yorumlar').insert(row).then(function(r){
+    if(!r.error){cb({},null);return;}
+    if(r.error.code==='23505'){cb(null,'Bu akademisyene daha önce değerlendirme yazdınız.');return;}
+    if(r.error.code==='42501'){cb(null,'Doğrulama geçersiz: okul (.edu.tr) e-postasıyla giriş yapın ya da mezun iseniz barkod numarası girin.');return;}
+    cb(null,sbErr(r.error));
+  });
 }
 function updateYorumDurum(id,durum,cb){
   if(!SB_READY){
@@ -833,13 +838,67 @@ function updateYorumDurum(id,durum,cb){
     db.yorumlar=db.yorumlar.map(function(y){return y.id===id?Object.assign({},y,{durum:durum}):y;});
     saveDB(db);if(cb)cb();return;
   }
-  sbFetch('yorumlar?id=eq.'+id,{method:'PATCH',headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({durum:durum})})
-    .then(function(){if(cb)cb();}).catch(function(e){if(cb)cb(e);});
+  SB.from('yorumlar').update({durum:durum}).eq('id',id).then(function(r){if(cb)cb(r.error);});
 }
 
-/* ══ PUAN ══ */
+/* ══ GİRİŞ (okul e-postasıyla tek kullanımlık link) ══ */
+function authRedirect(sayfa){return location.origin+location.pathname+'?sayfa='+sayfa;}
+function renderAuthBox(){
+  var el=document.getElementById('auth-box');if(!el)return;
+  if(!SB_READY){el.innerHTML='<div class="auth-note">Demo modu: veritabanı bağlı değil, değerlendirmeler sadece bu tarayıcıda saklanır ve doğrulama yapılmaz.</div>';return;}
+  if(SESSION){
+    var em=SESSION.user.email||'';
+    el.innerHTML='<div class="auth-ok">✓ doğrulandı: '+escH(em)+'<button class="linkbtn" onclick="cikisYap()">çıkış</button></div>'+
+      (/\.edu\.tr$/i.test(em)?'':'<div class="auth-note">Bu adres okul e-postası değil; yalnızca mezun rolüyle ve barkod numarasıyla değerlendirme yazabilirsiniz.</div>');
+    return;
+  }
+  el.innerHTML='<div>Değerlendirme yazmak için <b>okul e-postanızı</b> doğrulayın.</div>'+
+    '<div class="auth-row"><input type="email" id="auth-email" placeholder="ad.soyad@ogr.universite.edu.tr" onkeydown="if(event.key===\'Enter\')linkGonder()"><button class="btn" onclick="linkGonder()">doğrulama linki gönder</button></div>'+
+    '<div class="auth-note" id="auth-msg">Sadece .edu.tr adresleri kabul edilir (mezunlar başka adres + barkod kullanabilir). E-postanız yayınlanmaz, yorumunuz anonim görünür.</div>';
+}
+function linkGonder(){
+  var em=(document.getElementById('auth-email').value||'').trim().toLowerCase();
+  var msg=document.getElementById('auth-msg');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){msg.textContent='Geçerli bir e-posta adresi girin.';return;}
+  if(!/\.edu\.tr$/.test(em)&&SEL_ROL!=='mezun'){msg.textContent='Okul e-postası (.edu.tr) gerekli. Mezunsanız önce "Mezun" rolünü seçin.';return;}
+  taslakKaydet();
+  msg.textContent='gönderiliyor…';
+  SB.auth.signInWithOtp({email:em,options:{emailRedirectTo:authRedirect('yorum')}}).then(function(r){
+    msg.textContent=r.error?'Gönderilemedi: '+sbErr(r.error):'✓ Link '+em+' adresine gönderildi. E-postadaki linke tıklayınca bu sayfaya döner ve yorumunuzu gönderebilirsiniz.';
+  });
+}
+function cikisYap(){if(SB)SB.auth.signOut();}
+// Linke tıklayıp dönen kişinin yazdıkları kaybolmasın
+function taslakKaydet(){
+  try{localStorage.setItem('pft_taslak',JSON.stringify({hoca:document.getElementById('sel-hoca').value,rol:SEL_ROL,genel:GENEL_STAR,cats:CAT_STARS,
+    metin:document.getElementById('yorum-text').value,donem:document.getElementById('donem').value,barkod:document.getElementById('barkod').value}));}catch(e){}
+}
+function taslakYukle(){
+  var t=null;try{t=JSON.parse(localStorage.getItem('pft_taslak')||'null');localStorage.removeItem('pft_taslak');}catch(e){}
+  if(!t||!t.hoca)return;
+  goPage('yorum',document.querySelectorAll('.ntab')[1]);
+  getHocalar(function(){setTimeout(function(){
+    var sel=document.getElementById('sel-hoca');sel.value=t.hoca;if(sel.value!==t.hoca)return;
+    loadProfil();
+    var rb=document.querySelector('.rol-btn[data-rol="'+t.rol+'"]');if(rb)secRol(rb);
+    if(t.genel)starTik(t.genel);
+    document.getElementById('yorum-text').value=t.metin||'';document.getElementById('donem').value=t.donem||'';document.getElementById('barkod').value=t.barkod||'';
+    Object.keys(t.cats||{}).forEach(function(k){if(t.cats[k])catTik(k,t.cats[k]);});
+  },400);});
+}
+function oturumGuncelle(session){
+  SESSION=session||null;
+  renderAuthBox();
+  if(!SESSION){IS_ADMIN=false;adminUI();updateBadge();return;}
+  SB.rpc('is_admin').then(function(r){IS_ADMIN=!!r.data;adminUI();updateBadge();});
+}
+if(SB_READY){
+  SB.auth.getSession().then(function(r){oturumGuncelle(r.data&&r.data.session);});
+  SB.auth.onAuthStateChange(function(ev,session){oturumGuncelle(session);});
+}
+
 function hesaplaPuan(yorumlar){
-  if(!yorumlar||!yorumlar.length)return null;
+  if(!yorumlar||yorumlar.length<MIN_YORUM)return null;
   var tW=0,tG=0,cT={ders:0,ulasim:0,guncel:0,adalet:0},cC={ders:0,ulasim:0,guncel:0,adalet:0};
   yorumlar.forEach(function(y){var w=ROL_W[y.rol]||1;tG+=y.genel*w;tW+=w;var cats=y.cats||{};
     Object.keys(cT).forEach(function(k){if(cats[k]){cT[k]+=cats[k]*w;cC[k]+=w;}});});
@@ -911,7 +970,7 @@ function renderProfilScore(list){
       '<div class="score-pill"><div class="sp-val" style="color:var(--ink2)">'+puan.count+'</div><div class="sp-lbl">onaylı yorum</div></div>'+
       (puan.cats?Object.keys(puan.cats).filter(function(k){return puan.cats[k];}).map(function(k){return'<div class="score-pill"><div class="sp-val">'+puan.cats[k].toFixed(1)+'/5</div><div class="sp-lbl">'+CAT_LBL[k].toLowerCase()+'</div></div>';}).join(''):'');
   }else{
-    sr.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--ink3);padding:.4rem 0">Henüz onaylı değerlendirme yok.</div>';
+    sr.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--ink3);padding:.4rem 0">'+(list.length?list.length+' onaylı değerlendirme var; puan '+MIN_YORUM+' değerlendirmeden sonra gösterilir.':'Henüz onaylı değerlendirme yok.')+'</div>';
   }
 }
 function renderYorumlar(list){
@@ -921,20 +980,21 @@ function renderYorumlar(list){
     var stars='';for(var i=1;i<=5;i++)stars+=i<=y.genel?'★':'☆';
     var cats=y.cats||{};
     var catH=Object.keys(cats).filter(function(k){return cats[k]>0;}).map(function(k){return'<span class="yi-cat">'+CAT_LBL[k].toLowerCase()+': '+cats[k]+'</span>';}).join('');
-    return'<div class="yorum-item"><div class="yi-head"><div class="yi-meta"><span class="yi-rol" style="background:'+ROL_BG[y.rol]+';color:'+ROL_C[y.rol]+'">'+ROL_LBL[y.rol]+'</span><span class="yi-stars">'+stars+'</span>'+(y.donem?'<span style="font-family:var(--mono);font-size:10px;color:var(--ink4)">'+y.donem+'</span>':'')+' </div><span class="yi-date">'+y.tarih+'</span></div>'+(catH?'<div class="yi-cats">'+catH+'</div>':'')+'<div class="yi-text">'+escH(y.metin||y.text||'')+'</div></div>';
+    return'<div class="yorum-item"><div class="yi-head"><div class="yi-meta"><span class="yi-rol" style="background:'+ROL_BG[y.rol]+';color:'+ROL_C[y.rol]+'">'+(ROL_LBL[y.rol]||'')+(y.email_domain?' · doğrulanmış':'')+'</span><span class="yi-stars">'+stars+'</span>'+(y.donem?'<span style="font-family:var(--mono);font-size:10px;color:var(--ink4)">'+escH(y.donem)+'</span>':'')+' </div><span class="yi-date">'+escH(y.tarih)+'</span></div>'+(catH?'<div class="yi-cats">'+catH+'</div>':'')+'<div class="yi-text">'+escH(y.metin||y.text||'')+'</div></div>';
   }).join('');
 }
 
 /* ══ YORUM GÖNDER ══ */
-function secRol(el){document.querySelectorAll('.rol-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');SEL_ROL=el.dataset.rol;}
+function secRol(el){document.querySelectorAll('.rol-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');SEL_ROL=el.dataset.rol;document.getElementById('barkod-alani').style.display=SEL_ROL==='mezun'?'block':'none';}
 function starTik(v){GENEL_STAR=v;document.querySelectorAll('#genel-stars .star').forEach(function(s,i){s.classList.toggle('on',i<v);});}
+function catTik(c,v){CAT_STARS[c]=v;document.querySelectorAll('.cat-stars[data-cat="'+c+'"] .cat-star').forEach(function(st,j){st.classList.toggle('on',j<v);});}
 function initCatStars(){
   Object.keys(CAT_STARS).forEach(function(k){CAT_STARS[k]=0;});
   document.querySelectorAll('.cat-stars').forEach(function(cont){
     var cat=cont.dataset.cat;cont.innerHTML='';
     [1,2,3,4,5].forEach(function(i){
       var s=document.createElement('span');s.className='cat-star';s.textContent='★';
-      s.onclick=(function(c,v){return function(){CAT_STARS[c]=v;document.querySelectorAll('.cat-stars[data-cat="'+c+'"] .cat-star').forEach(function(st,j){st.classList.toggle('on',j<v);});}})(cat,i);
+      s.onclick=(function(c,v){return function(){catTik(c,v);}})(cat,i);
       cont.appendChild(s);
     });
   });
@@ -945,10 +1005,17 @@ function yorumGonder(){
   if(!hocaId){showErr('y-err','Lütfen akademisyen seçin.');return;}
   if(!GENEL_STAR){showErr('y-err','Lütfen genel puan verin.');return;}
   if(text.length<20){showErr('y-err','En az 20 karakter yazın.');return;}
+  var barkod=(document.getElementById('barkod').value||'').trim();
+  if(SB_READY){
+    if(!SESSION){showErr('y-err','Göndermeden önce okul e-postanızı doğrulayın (aşağıdaki kutu).');return;}
+    var edu=/\.edu\.tr$/i.test(SESSION.user.email||'');
+    if(!edu&&SEL_ROL!=='mezun'){showErr('y-err','Okul e-postası olmayan hesaplar yalnızca mezun olarak değerlendirme yazabilir.');return;}
+    if(!edu&&barkod.length<8){showErr('y-err','Mezuniyet belgesi barkod numarasını girin.');return;}
+  }
   showErr('y-err','');
   var btn=document.querySelector('#pg-yorum .btn.primary');
   if(btn)btn.disabled=true;
-  var y={id:'y_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),hocaId:hocaId,rol:SEL_ROL,genel:GENEL_STAR,cats:Object.assign({},CAT_STARS),text:text,donem:document.getElementById('donem').value.trim(),tarih:new Date().toLocaleDateString('tr-TR'),agirlik:ROL_W[SEL_ROL]};
+  var y={id:'y_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),hocaId:hocaId,rol:SEL_ROL,genel:GENEL_STAR,cats:Object.assign({},CAT_STARS),text:text,donem:document.getElementById('donem').value.trim(),tarih:new Date().toLocaleDateString('tr-TR'),agirlik:ROL_W[SEL_ROL],barkod:SEL_ROL==='mezun'&&barkod?barkod:null};
   insertYorum(y,function(d,err){
     if(btn)btn.disabled=false;
     if(err){showErr('y-err','Gönderilemedi: '+err);return;}
@@ -956,6 +1023,7 @@ function yorumGonder(){
     document.querySelectorAll('#genel-stars .star').forEach(function(s){s.classList.remove('on');});
     document.getElementById('yorum-text').value='';
     document.getElementById('donem').value='';
+    document.getElementById('barkod').value='';
     initCatStars();
     var t=document.getElementById('toast');t.classList.add('on');setTimeout(function(){t.classList.remove('on');},4000);
     updateBadge();
@@ -969,13 +1037,36 @@ function yorumGonder(){
 }
 
 /* ══ ADMİN ══ */
-function adminLogin(){
-  if(document.getElementById('admin-pw').value!==ADMIN_PW){document.getElementById('login-err').style.display='block';return;}
-  document.getElementById('admin-login').style.display='none';
-  document.getElementById('admin-panel').classList.add('on');
-  renderAdmin();
+function adminUI(){
+  document.getElementById('admin-sb').style.display=SB_READY?'block':'none';
+  document.getElementById('admin-demo').style.display=SB_READY?'none':'block';
+  if(!SB_READY)return;
+  var on=SESSION&&IS_ADMIN;
+  document.getElementById('admin-login').style.display=on?'none':'block';
+  document.getElementById('admin-panel').classList.toggle('on',!!on);
+  if(on&&document.getElementById('pg-admin').classList.contains('on'))renderAdmin();
+  var err=document.getElementById('login-err');
+  if(SESSION&&!IS_ADMIN){err.textContent=SESSION.user.email+' admin listesinde değil.';err.style.display='block';}else err.style.display='none';
 }
-function adminLogout(){document.getElementById('admin-panel').classList.remove('on');document.getElementById('admin-login').style.display='block';document.getElementById('admin-pw').value='';}
+function adminLogin(){
+  if(!SB_READY){
+    if(document.getElementById('admin-pw').value!==ADMIN_PW){document.getElementById('login-err-demo').style.display='block';return;}
+    document.getElementById('admin-login').style.display='none';
+    document.getElementById('admin-panel').classList.add('on');
+    renderAdmin();return;
+  }
+  var em=(document.getElementById('admin-email').value||'').trim();
+  var note=document.getElementById('admin-note');
+  if(!em){note.textContent='E-posta adresinizi girin.';return;}
+  note.textContent='gönderiliyor…';
+  SB.auth.signInWithOtp({email:em,options:{emailRedirectTo:authRedirect('admin')}}).then(function(r){
+    note.textContent=r.error?'Gönderilemedi: '+sbErr(r.error):'✓ Giriş linki gönderildi, e-postanızı kontrol edin.';
+  });
+}
+function adminLogout(){
+  if(SB_READY){SB.auth.signOut();return;}
+  document.getElementById('admin-panel').classList.remove('on');document.getElementById('admin-login').style.display='block';document.getElementById('admin-pw').value='';
+}
 function renderAdmin(){
   document.getElementById('kuyruk-liste').innerHTML='<div class="loading"><span class="spin">◐</span> yükleniyor</div>';
   getHocalar(function(hocalar){
@@ -985,9 +1076,9 @@ function renderAdmin(){
       var cats=y.cats||{};
       var catH=Object.keys(cats).filter(function(k){return cats[k]>0;}).map(function(k){return'<span class="yi-cat">'+CAT_LBL[k].toLowerCase()+': '+cats[k]+'</span>';}).join('');
       var acts=isBekleyen?
-        '<div class="qi-actions"><button class="btn ok" data-id="'+y.id+'" data-d="onaylandi">✓ onayla</button><button class="btn danger" data-id="'+y.id+'" data-d="reddedildi">✕ reddet</button></div>':
-        '<div class="qi-actions"><button class="btn" data-id="'+y.id+'" data-d="reddedildi">↩ geri al</button></div>';
-      return'<div class="queue-item"><div class="qi-hoca">'+hIsim(y.hoca_id||y.hocaId)+'</div><div class="qi-meta"><span style="background:'+ROL_BG[y.rol]+';color:'+ROL_C[y.rol]+';padding:1px 6px;border:1px solid currentColor;font-family:var(--mono);font-size:10px">'+ROL_LBL[y.rol]+'</span><span>'+stars+'</span><span>'+y.tarih+'</span><span>'+y.agirlik+'×</span></div>'+(catH?'<div class="qi-cats">'+catH+'</div>':'')+'<div class="qi-text">'+escH(y.metin||y.text||'')+'</div>'+acts+'</div>';
+        '<div class="qi-actions"><button class="btn ok" data-id="'+escH(y.id)+'" data-d="onaylandi">✓ onayla</button><button class="btn danger" data-id="'+escH(y.id)+'" data-d="reddedildi">✕ reddet</button></div>':
+        '<div class="qi-actions"><button class="btn" data-id="'+escH(y.id)+'" data-d="reddedildi">↩ geri al</button></div>';
+      return'<div class="queue-item"><div class="qi-hoca">'+escH(hIsim(y.hoca_id||y.hocaId))+'</div><div class="qi-meta"><span style="background:'+ROL_BG[y.rol]+';color:'+ROL_C[y.rol]+';padding:1px 6px;border:1px solid currentColor;font-family:var(--mono);font-size:10px">'+(ROL_LBL[y.rol]||'')+'</span><span>'+stars+'</span><span>'+escH(y.tarih)+'</span><span>'+escH(String(y.agirlik))+'×</span>'+(y.email_domain?'<span>'+escH(y.email_domain)+'</span>':'')+(y.barkod?'<span>barkod: '+escH(y.barkod)+'</span>':'')+'</div>'+(catH?'<div class="qi-cats">'+catH+'</div>':'')+'<div class="qi-text">'+escH(y.metin||y.text||'')+'</div>'+acts+'</div>';
     }
     getAllYorumlar('bekleyen',function(bek){
       document.getElementById('stat-b').textContent=bek.length;
@@ -1360,10 +1451,17 @@ function showErr(id,m){var b=document.getElementById(id);if(!b)return;b.textCont
 function setPtxt(t){document.getElementById('ptxt').textContent=t;}
 function stepSet(id,st){var e=document.getElementById(id);e.className='step'+(st?' '+st:'');var ic=e.querySelector('.sic');if(st==='act')ic.innerHTML='<span class="spin">◐</span>';else if(st==='ok')ic.textContent='✓';else if(st==='err')ic.textContent='✕';else ic.textContent='';}
 function resetSteps(){['s1','s2','s3','s4','s5'].forEach(function(id){stepSet(id,'');});}
-function escH(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escH(s){return(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 initHocaSelect();
 updateBadge();
+renderAuthBox();
+adminUI();
+(function(){
+  var sayfa=new URLSearchParams(location.search).get('sayfa');
+  if(sayfa==='admin')goPage('admin',document.querySelectorAll('.ntab')[2]);
+  else if(sayfa==='yorum'){goPage('yorum',document.querySelectorAll('.ntab')[1]);taslakYukle();}
+})();
 </script>
 </body>
 </html>
