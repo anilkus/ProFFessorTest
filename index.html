@@ -6,9 +6,10 @@
 <meta name="theme-color" content="#16794d">
 <meta name="description" content="Transparent academic evaluation for Turkish universities. ProFFessorTest pulls real data from OpenAlex — H-index, citations, international collaboration — combines it with admin-approved student reviews, and maps each academic against their current title. No self-reporting. No gaming the system. Just what the data says.">
 <title>ProFFessorTest — Akademik Değerlendirme</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2038%2042%22%3E%3Cpath%20d%3D%22M19%201.5%2035%207v13.5C35%2030.5%2028.3%2037.6%2019%2040.5%209.7%2037.6%203%2030.5%203%2020.5V7Z%22%20fill%3D%22%232f7a52%22/%3E%3Cpath%20d%3D%22M19%209.5%2029%2013.6%2019%2017.7%209%2013.6Z%22%20fill%3D%22%23f3e3b5%22/%3E%3Cpath%20d%3D%22M13.2%2015.6v3.6c0%201.6%202.6%202.9%205.8%202.9s5.8-1.3%205.8-2.9v-3.6L19%2018Z%22%20fill%3D%22%23f3e3b5%22/%3E%3Cpath%20d%3D%22M13.4%2027.4l3.6%203.6%207.6-7.6%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Saira:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
@@ -39,7 +40,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16p
 
 /* NAV */
 nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 2rem;position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.logo{display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:12px;padding:2px 6px 2px 2px;margin-left:-2px;transition:background .15s}
+.logo:hover{background:var(--moss3)}
+.logo:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+.lsvg{width:38px;height:42px;flex-shrink:0;display:block}
+.lname{font-family:'Saira','Comic Relief',sans-serif!important;font-weight:800!important;letter-spacing:.2px!important;text-transform:none}
+.lname b{color:var(--moss)}
 .lmark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--moss2),var(--moss));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:700;flex-shrink:0}
 .lname{font-size:1.1rem;font-weight:700;color:var(--ink);letter-spacing:-.3px}
 .ltag{font-size:12px;color:var(--ink3)}
@@ -289,9 +295,16 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 <body>
 
 <nav>
-  <div class="logo">
-    <div class="lmark">P</div>
-    <span class="lname">ProFFessorTest</span>
+  <div class="logo" role="link" tabindex="0" title="Ana sayfa" onclick="anaSayfa()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();anaSayfa();}">
+    <svg class="lsvg" viewBox="0 0 38 42" aria-hidden="true">
+      <path d="M19 1.5 35 7v13.5C35 30.5 28.3 37.6 19 40.5 9.7 37.6 3 30.5 3 20.5V7Z" fill="var(--moss)"/>
+      <path d="M19 5.2 31.6 9.6v10.9c0 8-5.1 13.8-12.6 16.4C11.5 34.3 6.4 28.5 6.4 20.5V9.6Z" fill="none" stroke="#f3e3b5" stroke-width="1.3"/>
+      <path d="M19 9.5 29 13.6 19 17.7 9 13.6Z" fill="#f3e3b5"/>
+      <path d="M13.2 15.6v3.6c0 1.6 2.6 2.9 5.8 2.9s5.8-1.3 5.8-2.9v-3.6L19 18Z" fill="#f3e3b5"/>
+      <path d="M27.3 14.4v5.2" stroke="#f3e3b5" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M13.4 27.4l3.6 3.6 7.6-7.6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="lname">Pro<b>FF</b>essorTest</span>
     <span class="ltag">akademisyenleri gerçek ölçütlerle tanı</span>
   </div>
   <div class="nav-tabs">
@@ -551,6 +564,11 @@ var GRC={VeriAz:'var(--ink3)',Mukemmel:'var(--moss2)',Iyi:'var(--ink)',Orta:'var
 var GRTR={VeriAz:'yetersiz veri',Mukemmel:'mükemmel',Iyi:'iyi',Orta:'orta',Yetersiz:'yetersiz',Kritik:'kritik'};
 
 /* ══ SAYFA ══ */
+function anaSayfa(){
+  goPage('analiz',document.querySelector('.ntab'));
+  if(history.replaceState&&location.search) history.replaceState(null,'',location.pathname);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 function goPage(id,btn){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
   document.getElementById('pg-'+id).classList.add('on');
