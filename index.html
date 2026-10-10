@@ -171,6 +171,20 @@ textarea:focus{border-color:var(--ink)}
 .src-tag{font-family:var(--mono);font-size:10px;display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--line)}
 .src-tag.ok{border-color:var(--moss2);color:var(--moss2)}
 .src-tag.no{color:var(--ink3)}
+.ac-wrap{position:relative}
+.ac-list{display:none;position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--paper);border:1px solid var(--line2);max-height:320px;overflow-y:auto}
+.ac-list.on{display:block}
+.ac-item{padding:.55rem .75rem;cursor:pointer;border-bottom:1px solid var(--line)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.sel{background:var(--paper2)}
+.ac-name{font-size:13.5px;color:var(--ink)}
+.ac-meta{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:2px}
+.ac-msg{padding:.55rem .75rem;font-family:var(--mono);font-size:10px;color:var(--ink3)}
+.ac-picked{font-family:var(--mono);font-size:10px;color:var(--moss2);margin-top:4px;display:none}
+.ac-picked.on{display:block}
+.orcid-row{margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--line)}
+.orcid-list{margin-top:.5rem;font-size:12.5px;color:var(--ink2);line-height:1.7}
+.orcid-list b{font-family:var(--mono);font-size:10px;font-weight:400;color:var(--ink3);text-transform:lowercase;margin-right:4px}
 
 /* RESULTS */
 .res{display:none}.res.on{display:block}
@@ -309,7 +323,7 @@ textarea:focus{border-color:var(--ink)}
       admin <span id="admin-badge" style="display:none">0</span>
     </button>
   </div>
-  <div class="nav-right"><div class="ndot"></div><span>OpenAlex · AI analiz</span></div>
+  <div class="nav-right"><div class="ndot"></div><span>OpenAlex · ORCID · öğrenci sesi</span></div>
 </nav>
 
 <!-- ═══ DEMO ═══ -->
@@ -344,7 +358,7 @@ textarea:focus{border-color:var(--ink)}
         <div>
           <div class="demo-col-label">Sistem otomatik yapar</div>
           <div class="demo-info-row"><div class="demo-info-n">01</div><div class="demo-info-v">OpenAlex'ten H-indeksi, atıf ve yayın verisi çeker</div></div>
-          <div class="demo-info-row"><div class="demo-info-n">02</div><div class="demo-info-v">Web'den proje, haber ve etik kayıt tarar</div></div>
+          <div class="demo-info-row"><div class="demo-info-n">02</div><div class="demo-info-v">ORCID'den etkinlik, proje, ödül ve hakemlik kayıtlarını çeker</div></div>
           <div class="demo-info-row"><div class="demo-info-n">03</div><div class="demo-info-v">Öğrenci yorumlarını ağırlıklı skorlar</div></div>
           <div class="demo-info-row"><div class="demo-info-n">04</div><div class="demo-info-v">Unvan yeterliliği ve kariyer haritası üretir</div></div>
         </div>
@@ -442,7 +456,7 @@ textarea:focus{border-color:var(--ink)}
         <div class="hero-src-title">— veri kaynakları</div>
         <div class="hero-src-item"><div class="hero-src-n">01</div><div class="hero-src-v">OpenAlex API — H-indeksi, atıf, uluslararası işbirliği</div></div>
         <div class="hero-src-item"><div class="hero-src-n">02</div><div class="hero-src-v">Topluluk yorumları — admin onaylı, ağırlıklı</div></div>
-        <div class="hero-src-item"><div class="hero-src-n">03</div><div class="hero-src-v">Web araması — haber, proje, etik kayıt</div></div>
+        <div class="hero-src-item"><div class="hero-src-n">03</div><div class="hero-src-v">ORCID — etkinlik, proje, ödül, hakemlik</div></div>
       </div>
     </div>
   </div>
@@ -455,7 +469,7 @@ textarea:focus{border-color:var(--ink)}
       <div class="section-no">— 002 / analiz</div>
       <div class="section-title">Akademisyen ara</div>
       <div class="frow">
-        <div><label>akademisyen adı soyadı</label><input type="text" id="fi" placeholder="Prof. Dr. Kuzey Orhan Kuş"></div>
+        <div class="ac-wrap"><label>akademisyen adı soyadı</label><input type="text" id="fi" placeholder="Prof. Dr. Kuzey Orhan Kuş" autocomplete="off" oninput="acInput()" onkeydown="acKey(event)" onblur="setTimeout(acHide,180)"><div class="ac-list" id="ac-list"></div><div class="ac-picked" id="ac-picked"></div></div>
         <div><label>unvan</label>
           <select id="fu">
             <optgroup label="Araştırma Görevlisi"><option>Arş. Gör.</option><option>Arş. Gör. Dr.</option></optgroup>
@@ -486,7 +500,7 @@ textarea:focus{border-color:var(--ink)}
           </select>
         </div>
       </div>
-      <div class="form-note">— H-indeksi, atıf ve yayın verileri OpenAlex'ten otomatik çekilir</div>
+      <div class="form-note">— isim yazdıkça Türkiye'deki eşleşen akademisyenler listelenir. H-indeksi, atıf ve yayın verileri OpenAlex'ten, etkinlik, görev, ödül ve projeler ORCID'den otomatik çekilir</div>
       <div class="errbx" id="a-err"></div>
       <button class="btn primary btn-full" id="sbtn" onclick="baslat()" style="margin-top:1rem">analiz başlat</button>
     </div>
@@ -496,10 +510,10 @@ textarea:focus{border-color:var(--ink)}
         <div class="ptitle"><span class="spin">◐</span><span id="ptxt">başlatılıyor</span><span id="timerTxt" style="color:var(--ink3);font-weight:400;font-size:10px;margin-left:4px"></span></div>
         <div class="steps">
           <div class="step" id="s1"><div class="sic"></div><span>OpenAlex'te yazar aranıyor</span></div>
-          <div class="step" id="s2"><div class="sic"></div><span>yayın ve atıf verileri çekiliyor</span></div>
+          <div class="step" id="s2"><div class="sic"></div><span>yayın, atıf ve ORCID etkinlik verileri çekiliyor</span></div>
           <div class="step" id="s3"><div class="sic"></div><span>veri işleniyor</span></div>
-          <div class="step" id="s4"><div class="sic"></div><span>web araması ve AI analizi</span></div>
-          <div class="step" id="s5"><div class="sic"></div><span>rapor oluşturuluyor</span></div>
+          <div class="step" id="s4"><div class="sic"></div><span>öğrenci değerlendirmeleri alınıyor</span></div>
+          <div class="step" id="s5"><div class="sic"></div><span>puan hesaplanıyor</span></div>
         </div>
       </div>
     </div>
@@ -508,6 +522,7 @@ textarea:focus{border-color:var(--ink)}
       <div class="section-no">— ham veriler <span id="dpSrc"></span></div>
       <div class="dpgrid" id="dpgrid"></div>
       <div class="dpgrid2" id="dpgrid2"></div>
+      <div class="orcid-row" id="orcidrow" style="display:none"></div>
     </div>
 
     <div class="res" id="res">
@@ -532,7 +547,7 @@ textarea:focus{border-color:var(--ink)}
       <div class="anal-wrap">
         <div class="section-no">— detaylı analiz</div>
         <div class="rawtext" id="ranaliz" style="margin-top:.75rem"></div>
-        <div class="disc">* Araştırma verileri OpenAlex'ten otomatik çekilir. Öğretim ve etik boyutlar web taramasına dayanır. Resmi değerlendirme belgesi değildir.</div>
+        <div class="disc">* Puan sabit ve açık bir formülle hesaplanır: araştırma ve yayın verileri OpenAlex'ten, etkinlik, proje ve hizmetler ORCID'den, öğretim puanı onaylı öğrenci/mezun değerlendirmelerinden gelir. Verisi olmayan boyut puana katılmaz. Unvan eşikleri yaklaşıktır ve alanlar arası farkları yansıtmaz. Resmi değerlendirme belgesi değildir.</div>
       </div>
       <div style="padding-top:1.5rem;border-top:1px solid var(--line);margin-top:.5rem">
         <button class="btn" onclick="goToYorum()">değerlendirme yaz →</button>
@@ -644,7 +659,6 @@ textarea:focus{border-color:var(--ink)}
 /* ══ AYARLAR ══ */
 var SUPABASE_URL      = 'BURAYA_SUPABASE_URL';
 var SUPABASE_ANON_KEY = 'BURAYA_SUPABASE_ANON_KEY';
-var PROXY_URL         = 'https://pft-proxy.anilkus01.workers.dev';
 var ADMIN_PW          = 'admin123';
 var EJS_PUBLIC_KEY    = 'BURAYA_EJS_PUBLIC_KEY';
 var EJS_SERVICE_ID    = 'BURAYA_EJS_SERVICE_ID';
@@ -652,10 +666,9 @@ var EJS_ADMIN_TPL     = 'BURAYA_EJS_ADMIN_TPL';
 var ADMIN_EMAIL       = 'BURAYA_ADMIN_EMAIL';
 
 var SB_READY   = SUPABASE_URL !== 'BURAYA_SUPABASE_URL';
-var API_BASE   = PROXY_URL !== 'BURAYA_PROXY_URL' ? PROXY_URL : 'https://api.anthropic.com';
 
 /* ══ STATE ══ */
-var TID=null, SEL_ROL='ogrenci', GENEL_STAR=0;
+var TID=null, SEL_ROL='ogrenci', GENEL_STAR=0, SEL_AUTHOR=null;
 var CAT_STARS={ders:0,ulasim:0,guncel:0,adalet:0};
 var CAT_LBL={ders:'Ders anlatımı',ulasim:'Ulaşılabilirlik',guncel:'Güncel içerik',adalet:'Sınav adaleti'};
 var ROL_W={ogrenci:1.0,mezun:1.2,meslektas:1.5,anonim:0.5};
@@ -663,9 +676,9 @@ var ROL_LBL={ogrenci:'Öğrenci',mezun:'Mezun',meslektas:'Meslektaş',anonim:'An
 var ROL_BG={ogrenci:'rgba(26,122,80,.1)',mezun:'rgba(40,160,106,.1)',meslektas:'rgba(100,80,180,.1)',anonim:'rgba(100,100,100,.1)'};
 var ROL_C={ogrenci:'var(--moss)',mezun:'var(--moss2)',meslektas:'#6450b4',anonim:'var(--ink3)'};
 var BASAMAK=['Arş. Gör.','Arş. Gör. Dr.','Öğr. Gör.','Öğr. Gör. Dr.','Dr. Öğr. Üyesi','Doç. Dr.','Prof. Dr.'];
-var DIMTR={Arastirma:'araştırma etkisi',Yayin:'yayın kalitesi',Ogretim:'öğretim kalitesi',Uluslararasi:'uluslararasılık',Fon:'proje ve fon',Etik:'etik bütünlük'};
-var GRC={Mukemmel:'var(--moss2)',Iyi:'var(--ink)',Orta:'var(--warn)',Yetersiz:'var(--danger)',Kritik:'var(--danger)'};
-var GRTR={Mukemmel:'mükemmel',Iyi:'iyi',Orta:'orta',Yetersiz:'yetersiz',Kritik:'kritik'};
+var DIMTR={Arastirma:'araştırma etkisi',Yayin:'güncel yayın',Ogretim:'öğretim (öğrenci sesi)',Uluslararasi:'uluslararasılık',Etkinlik:'etkinlik, proje ve hizmet',Etik:'etik bütünlük'};
+var GRC={VeriAz:'var(--ink3)',Mukemmel:'var(--moss2)',Iyi:'var(--ink)',Orta:'var(--warn)',Yetersiz:'var(--danger)',Kritik:'var(--danger)'};
+var GRTR={VeriAz:'yetersiz veri',Mukemmel:'mükemmel',Iyi:'iyi',Orta:'orta',Yetersiz:'yetersiz',Kritik:'kritik'};
 
 /* ══ DEMO OTOMATİK DÖNGÜ ══ */
 (function(){
@@ -1006,7 +1019,8 @@ function baslat(){
   var bol=document.getElementById('fbol').value;
   var unv=document.getElementById('fu').value;
   if(!isim){showErr('a-err','Lütfen akademisyen adı soyadı girin.');return;}
-  if(!uni){showErr('a-err','Lütfen üniversite seçin.');return;}
+  if(!uni&&!SEL_AUTHOR){showErr('a-err','Lütfen listeden bir akademisyen seçin ya da üniversite seçin.');return;}
+  if(!uni)uni=SEL_AUTHOR.inst||'';
   showErr('a-err','');
   document.getElementById('sbtn').disabled=true;
   document.getElementById('res').classList.remove('on');
@@ -1015,17 +1029,116 @@ function baslat(){
   resetSteps();
   var secs=0;TID=setInterval(function(){secs++;document.getElementById('timerTxt').textContent='('+secs+'s)';},1000);
   stepSet('s1','act');setPtxt('OpenAlex\'te yazar aranıyor…');
-  searchOpenAlex(isim,uni,function(author){
+  var find=SEL_AUTHOR?function(cb){fetchAuthor(SEL_AUTHOR.id,cb);}:function(cb){searchOpenAlex(isim,uni,cb);};
+  find(function(author){
     stepSet('s1',author?'ok':'err');
-    stepSet('s2','act');setPtxt('yayın verileri çekiliyor…');
-    if(author&&author.id){fetchWorks(author.id,function(works){stepSet('s2','ok');continueAnalysis(author,works,isim,uni,bol,unv);});}
-    else{stepSet('s2','err');continueAnalysis(null,[],isim,uni,bol,unv);}
+    stepSet('s2','act');setPtxt('yayın ve ORCID verileri çekiliyor…');
+    if(author&&author.id){
+      var works=null,orcid=null;
+      var done=function(){if(works===null||orcid===null)return;stepSet('s2','ok');continueAnalysis(author,works,isim,uni,bol,unv,orcid);};
+      fetchWorks(author.id,function(w){works=w;done();});
+      fetchOrcid(author.orcid,function(o){orcid=o||false;done();});
+    }
+    else{stepSet('s2','err');continueAnalysis(null,[],isim,uni,bol,unv,false);}
   });
+}
+
+/* ══ AKADEMİSYEN ARAMA (OpenAlex aday listesi) ══ */
+var AC_T=null, AC_SEQ=0, AC_RES=[], AC_IDX=-1;
+var OA_MAIL='&mailto=professortestapp@example.com';
+function acInput(){
+  SEL_AUTHOR=null;
+  var p=document.getElementById('ac-picked');p.classList.remove('on');p.textContent='';
+  clearTimeout(AC_T);
+  var q=document.getElementById('fi').value.trim().replace(/^((prof|doç|dr|öğr|arş|gör)\.\s*|üyesi\s+)+/gi,'');
+  if(q.length<3){acHide();return;}
+  AC_T=setTimeout(function(){acSearch(q);},350);
+}
+function acSearch(q){
+  var seq=++AC_SEQ;
+  acShow('<div class="ac-msg">aranıyor…</div>');
+  fetch('https://api.openalex.org/authors?search='+encodeURIComponent(q)+'&filter=affiliations.institution.country_code:TR&per_page=8&select=id,display_name,orcid,works_count,cited_by_count,summary_stats,last_known_institutions'+OA_MAIL)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(seq!==AC_SEQ)return;
+      AC_RES=d.results||[];AC_IDX=-1;
+      if(!AC_RES.length){acShow('<div class="ac-msg">eşleşme bulunamadı. Üniversite seçip yine de analiz başlatabilirsiniz.</div>');return;}
+      acShow(AC_RES.map(function(a,i){
+        var inst=acInst(a);
+        var h=(a.summary_stats||{}).h_index;
+        return'<div class="ac-item" onmousedown="acPick('+i+')"><div class="ac-name">'+escH(a.display_name)+'</div><div class="ac-meta">'+
+          (inst?escH(inst)+' · ':'')+(a.works_count||0)+' yayın · '+(a.cited_by_count||0).toLocaleString('tr')+' atıf'+(h!=null?' · h:'+h:'')+(a.orcid?' · ORCID':'')+'</div></div>';
+      }).join(''));
+    }).catch(function(){if(seq===AC_SEQ)acShow('<div class="ac-msg">OpenAlex\'e ulaşılamadı.</div>');});
+}
+function acInst(a){var l=a.last_known_institutions||[];var tr=l.filter(function(i){return i.country_code==='TR';})[0]||l[0];return tr?tr.display_name:'';}
+function acShow(html){var l=document.getElementById('ac-list');l.innerHTML=html;l.classList.add('on');}
+function acHide(){document.getElementById('ac-list').classList.remove('on');}
+function acKey(e){
+  var l=document.getElementById('ac-list');if(!l.classList.contains('on')||!AC_RES.length)return;
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    e.preventDefault();AC_IDX=(AC_IDX+(e.key==='ArrowDown'?1:-1)+AC_RES.length)%AC_RES.length;
+    l.querySelectorAll('.ac-item').forEach(function(el,i){el.classList.toggle('sel',i===AC_IDX);});
+  }else if(e.key==='Enter'&&AC_IDX>-1){e.preventDefault();acPick(AC_IDX);}
+  else if(e.key==='Escape')acHide();
+}
+function acPick(i){
+  var a=AC_RES[i];if(!a)return;
+  var inst=acInst(a);
+  SEL_AUTHOR={id:a.id,name:a.display_name,orcid:a.orcid||null,inst:inst};
+  document.getElementById('fi').value=a.display_name;
+  if(inst){
+    var sel=document.getElementById('funi'),low=inst.toLocaleLowerCase('tr'),hit=null;
+    Array.prototype.forEach.call(sel.options,function(o){if(o.value&&o.value.toLocaleLowerCase('tr')===low)hit=o;});
+    if(!hit){hit=document.createElement('option');hit.textContent=inst;sel.appendChild(hit);}
+    sel.value=hit.value;
+  }
+  var p=document.getElementById('ac-picked');p.textContent='✓ seçildi: '+a.display_name+(inst?' · '+inst:'')+(a.orcid?' · ORCID bağlı':'');p.classList.add('on');
+  acHide();
+}
+function fetchAuthor(id,cb){
+  var short=String(id).split('/').pop();
+  fetch('https://api.openalex.org/authors/'+short+'?select=id,display_name,orcid,works_count,cited_by_count,summary_stats,affiliations,topics,counts_by_year'+OA_MAIL)
+    .then(function(r){return r.ok?r.json():null;}).then(function(a){cb(a&&a.id?a:null);}).catch(function(){cb(null);});
+}
+
+/* ══ ORCID (etkinlik, görev, ödül, proje) ══ */
+var ORCID_SEC=[
+  {k:'employments',s:'employment-summary',l:'Görevler'},
+  {k:'invited-positions',s:'invited-position-summary',l:'Davetli pozisyonlar'},
+  {k:'distinctions',s:'distinction-summary',l:'Ödüller'},
+  {k:'memberships',s:'membership-summary',l:'Üyelikler'},
+  {k:'services',s:'service-summary',l:'Hizmetler'}
+];
+function fetchOrcid(orcidUrl,cb){
+  if(!orcidUrl){cb(null);return;}
+  var oid=String(orcidUrl).split('/').pop();
+  fetch('https://pub.orcid.org/v3.0/'+oid+'/activities',{headers:{'Accept':'application/json'}})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){cb(d?parseOrcid(oid,d):null);}).catch(function(){cb(null);});
+}
+function parseOrcid(oid,d){
+  function yr(x){return x&&x.year&&x.year.value?x.year.value:'';}
+  var out={id:oid,sections:[],fundings:[],peer_reviews:0,total:0};
+  ORCID_SEC.forEach(function(sec){
+    var items=[];
+    ((d[sec.k]||{})['affiliation-group']||[]).forEach(function(g){(g.summaries||[]).forEach(function(s){
+      var x=s[sec.s];if(!x)return;
+      var org=x.organization&&x.organization.name||'';
+      var y=yr(x['start-date']),y2=yr(x['end-date']);
+      items.push([x['role-title'],x['department-name'],org].filter(Boolean).join(', ')+(y?' ('+y+(y2&&y2!==y?'-'+y2:'')+')':''));
+    });});
+    if(items.length){out.sections.push({label:sec.l,items:items});out.total+=items.length;}
+  });
+  ((d.fundings||{}).group||[]).forEach(function(g){var f=(g['funding-summary']||[])[0];if(f&&f.title&&f.title.title)out.fundings.push(f.title.title.value+(f.organization&&f.organization.name?' ('+f.organization.name+')':''));});
+  out.total+=out.fundings.length;
+  ((d['peer-reviews']||{}).group||[]).forEach(function(g){out.peer_reviews+=((g['peer-review-group']||[]).length||1);});
+  return out;
 }
 
 function searchOpenAlex(name,uni,cb){
   var q=encodeURIComponent(name);
-  fetch('https://api.openalex.org/authors?search='+q+'&filter=affiliations.institution.country_code:TR&per_page=5&select=id,display_name,works_count,cited_by_count,summary_stats,affiliations,topics,counts_by_year&mailto=professortestapp@example.com')
+  fetch('https://api.openalex.org/authors?search='+q+'&filter=affiliations.institution.country_code:TR&per_page=5&select=id,display_name,orcid,works_count,cited_by_count,summary_stats,affiliations,topics,counts_by_year&mailto=professortestapp@example.com')
     .then(function(r){return r.json();})
     .then(function(d){
       var results=d.results||[];
@@ -1046,24 +1159,20 @@ function fetchWorks(aid,cb){
     .then(function(d){cb(d.results||[]);}).catch(function(){cb([]);});
 }
 
-function continueAnalysis(author,works,isim,uni,bol,unv){
+function continueAnalysis(author,works,isim,uni,bol,unv,orcid){
   stepSet('s3','act');setPtxt('veriler işleniyor…');
   var d=processRaw(author,works,isim);
+  d.orcid=orcid||null;d.orcid_id=author&&author.orcid?String(author.orcid).split('/').pop():null;
   showDataPanel(d);
-  stepSet('s3','ok');stepSet('s4','act');setPtxt('AI analizi başlıyor…');
-  if(SB_READY){
-    upsertHoca(d.name||isim,uni,function(h){
-      if(h&&h.id){
-        getYorumlar(h.id,'onaylandi',function(yorumlar){
-          var cp=hesaplaPuan(yorumlar);
-          apiCall([{role:'user',content:buildCtx(d,isim,uni,bol,unv,cp)}],function(data,err){multiTurn(data,err,buildCtx(d,isim,uni,bol,unv,cp),0,isim,uni,unv);});
-        });
-      }else{apiCall([{role:'user',content:buildCtx(d,isim,uni,bol,unv,null)}],function(data,err){multiTurn(data,err,buildCtx(d,isim,uni,bol,unv,null),0,isim,uni,unv);});}
-    });
-  }else{
-    var ctx=buildCtx(d,isim,uni,bol,unv,null);
-    apiCall([{role:'user',content:ctx}],function(data,err){multiTurn(data,err,ctx,0,isim,uni,unv);});
-  }
+  stepSet('s3','ok');stepSet('s4','act');setPtxt('öğrenci değerlendirmeleri alınıyor…');
+  upsertHoca(d.name||isim,uni,function(h){
+    var next=function(yorumlar){
+      stepSet('s4','ok');stepSet('s5','act');setPtxt('puan hesaplanıyor…');
+      var r=puanla(d,hesaplaPuan(yorumlar),isim,uni,bol,unv);
+      stepSet('s5','ok');finishOk(r,isim,uni,unv);
+    };
+    if(h&&h.id)getYorumlar(h.id,'onaylandi',next);else next([]);
+  });
 }
 
 function processRaw(author,works,name){
@@ -1093,54 +1202,109 @@ function showDataPanel(d){
     document.getElementById('dpgrid').innerHTML=stat('Durum','Bulunamadı','','var(--ink3)')+stat('H','?','')+stat('Atıf','?','')+stat('Yayın','?','');
     document.getElementById('dpgrid2').innerHTML=stat('Son 3 yıl','?','')+stat('Uluslararası','%?','')+stat('Geri çekilen','?','');
   }
+  var orow=document.getElementById('orcidrow');
+  if(d.orcid){
+    var o=d.orcid,html='<div class="dstat-lbl"><span class="src-tag ok">ORCID</span> etkinlik, görev ve projeler</div>';
+    if(!o.total&&!o.peer_reviews)html+='<div class="orcid-list">ORCID profilinde etkinlik bilgisi girilmemiş.</div>';
+    else{
+      html+='<div class="orcid-list">'+o.sections.map(function(s){return'<div><b>'+s.label+' ('+s.items.length+')</b>'+escH(s.items.slice(0,3).join(' · '))+(s.items.length>3?' …':'')+'</div>';}).join('')+
+        (o.fundings.length?'<div><b>Projeler/fonlar ('+o.fundings.length+')</b>'+escH(o.fundings.slice(0,3).join(' · '))+(o.fundings.length>3?' …':'')+'</div>':'')+
+        (o.peer_reviews?'<div><b>Hakemlik</b>'+o.peer_reviews+' kayıt</div>':'')+'</div>';
+    }
+    orow.innerHTML=html;orow.style.display='block';
+  }else if(d.found){
+    orow.innerHTML='<div class="dstat-lbl"><span class="src-tag no">ORCID</span> '+(d.orcid_id?'ORCID verisine ulaşılamadı':'bağlı ORCID kaydı yok')+'</div>';orow.style.display='block';
+  }else orow.style.display='none';
   document.getElementById('datapanel').classList.add('on');
 }
 
-function buildCtx(d,isim,uni,bol,unv,cp){
-  var s='Asagidaki GERCEK verilerle degerlendir:\nKIMIK: '+isim+' | '+uni+(bol?' | '+bol:'')+' | Unvan: '+unv+'\nOPENALEX: '+(d.found?'Bulundu':'Bulunamadi')+'\n';
-  if(d.found)s+='H:'+d.h_index+' Atif:'+d.cited_by_count+' Yayin:'+d.works_count+' i10:'+d.i10_index+' Son3yil:'+d.recent_works+' Intl:%'+d.intl_collab_pct+' GeriCekilen:'+d.retracted+'\n';
-  if(cp)s+='TOPLULUK: Genel:'+cp.genel+'/5 ('+cp.count+' yorum) Ogretim:'+cp.ogretim+'/20\n';
-  return s;
-}
+/* ══ PUANLAMA (ücretsiz, açık formül) ══
+   Boyut ağırlıkları: yayın tek başına puanı belirleyemesin diye öğretim ve etkinlik
+   toplamda araştırma+yayından daha ağır. Verisi olmayan boyut hesaba katılmaz. */
+var UNVAN_ESIK={'Arş. Gör.':{h:0,w:0},'Arş. Gör. Dr.':{h:2,w:3},'Öğr. Gör.':{h:0,w:0},'Öğr. Gör. Dr.':{h:2,w:3},
+  'Dr. Öğr. Üyesi':{h:3,w:5},'Doç. Dr.':{h:6,w:15},'Prof. Dr.':{h:10,w:30}};
+var UNVAN_SONRAKI={'Arş. Gör.':'Arş. Gör. Dr.','Arş. Gör. Dr.':'Dr. Öğr. Üyesi','Öğr. Gör.':'Öğr. Gör. Dr.',
+  'Öğr. Gör. Dr.':'Dr. Öğr. Üyesi','Dr. Öğr. Üyesi':'Doç. Dr.','Doç. Dr.':'Prof. Dr.'};
+var UNVAN_ONCEKI={'Arş. Gör. Dr.':'Arş. Gör.','Öğr. Gör. Dr.':'Öğr. Gör.','Dr. Öğr. Üyesi':'Öğr. Gör. Dr.','Doç. Dr.':'Dr. Öğr. Üyesi','Prof. Dr.':'Doç. Dr.'};
+function cap(x){return Math.max(0,Math.min(1,x));}
+function r1(x){return Math.round(x*10)/10;}
 
-var SYS='Sen Turk akademisini analitik degerlendiren bir uzmansın. GERCEK OpenAlex verilerini ve topluluk degerlendirmelerini temel al.\n\nYanitini 2 bolumde ver:\nBOLUM 1: Sadece tek satir JSON:\n{"isim":"Ad Soyad","univan":"Universite Bolum","initials":"AK","toplam_puan":55,"grade":"Orta","etiketler":[{"text":"etiket","tip":"green"}],"boyutlar":[{"isim":"Arastirma","puan":15,"max":30,"renk":"#1a7a50"},{"isim":"Yayin","puan":10,"max":20,"renk":"#1a7a50"},{"isim":"Ogretim","puan":12,"max":20,"renk":"#1a7a50"},{"isim":"Uluslararasi","puan":8,"max":15,"renk":"#1a7a50"},{"isim":"Fon","puan":6,"max":10,"renk":"#1a7a50"},{"isim":"Etik","puan":4,"max":5,"renk":"#1a7a50"}],"bulgular":[{"tip":"orange","ikon":"!","baslik":"Baslik","aciklama":"aciklama"}],"uyum":{"puan":62,"renk":"orange","mesaj":"Kismi uyum","detay":["guclu","zayif"]},"sonraki":{"unvan":"Prof. Dr.","yakinlik":28,"sure":"2-3 yil","eksik":["Q1 dergi","uluslararasi"]}}\nJSON: string degerler ASCII, sayilar integer, uyum.puan<40 ise "oneri_unvan":"alt unvan" ekle\nBOLUM 2: JSON sonrasi bos satir, Turkce serbest analiz.';
+function puanla(d,cp,isim,uni,bol,unv){
+  var o=d.orcid,dims=[],bulg=[],tags=[];
+  function oSay(lbl){if(!o)return 0;var s=o.sections.filter(function(x){return x.label===lbl;})[0];return s?s.items.length:0;}
 
-function multiTurn(d,e,msg,tur,isim,uni,unv){
-  if(e){finishErr(e);return;}
-  if(d.stop_reason!=='tool_use'||tur>=6){
-    stepSet('s4','ok');stepSet('s5','act');setPtxt('rapor oluşturuluyor…');
-    var txt='';(d.content||[]).forEach(function(b){if(b.type==='text')txt+=b.text+'\n';});
-    var parsed=parseJ(txt);
-    if(!parsed){finishErr('Sonuç işlenemedi. Lütfen tekrar deneyin.');return;}
-    var jEnd=txt.lastIndexOf('}');
-    parsed.analiz=jEnd>-1?txt.slice(jEnd+1).trim():'Detaylı analiz için bulgulara bakın.';
-    stepSet('s5','ok');finishOk(parsed,isim,uni,unv);return;
+  // Araştırma etkisi (20): h-indeksi ve atıf
+  dims.push({isim:'Arastirma',max:20,puan:d.found?r1(cap(d.h_index/20)*14+cap(Math.log10(d.cited_by_count+1)/Math.log10(2000))*6):null});
+  // Güncel yayın (15): son 3 yıl üretkenlik + i10 oranı
+  dims.push({isim:'Yayin',max:15,puan:d.found?r1(cap(d.recent_works/9)*9+cap((d.works_count?d.i10_index/d.works_count:0)/0.5)*6):null});
+  // Öğretim (25): ağırlıklı öğrenci/mezun puanı, az yorumda nötre (3/5) çekilir
+  var ogr=null;
+  if(cp&&cp.count){var g=cp.count/(cp.count+3);ogr=r1(((cp.genel*g+3*(1-g))/5)*25);}
+  dims.push({isim:'Ogretim',max:25,puan:ogr});
+  // Uluslararasılık (10)
+  dims.push({isim:'Uluslararasi',max:10,puan:d.found?r1(cap(d.intl_collab_pct/40)*10):null});
+  // Etkinlik, proje ve hizmet (20): ORCID
+  var etk=null;
+  if(o){
+    var hizmet=oSay('Davetli pozisyonlar')+oSay('Hizmetler')+oSay('Üyelikler');
+    etk=r1(cap(o.fundings.length/3)*7+cap(oSay('Ödüller')/2)*4+cap(hizmet/4)*5+cap(o.peer_reviews/10)*4);
   }
-  tur++;
-  var uses=(d.content||[]).filter(function(b){return b.type==='tool_use';});
-  var res=uses.map(function(b){return{type:'tool_result',tool_use_id:b.id,content:''};});
-  if(tur===1)setPtxt('web araması yapılıyor…');
-  apiCall([{role:'user',content:msg},{role:'assistant',content:d.content},{role:'user',content:res}],function(d2,e2){multiTurn(d2,e2,msg,tur,isim,uni,unv);});
+  dims.push({isim:'Etkinlik',max:20,puan:etk});
+  // Etik (10): geri çekilen her yayın -5
+  dims.push({isim:'Etik',max:10,puan:d.found?Math.max(0,10-5*d.retracted):null});
+
+  var top=0,mx=0;dims.forEach(function(x){if(x.puan!=null){top+=x.puan;mx+=x.max;}});
+  var toplam=mx?Math.round(top/mx*100):null;
+  var grade=mx<50?'VeriAz':toplam>=80?'Mukemmel':toplam>=65?'Iyi':toplam>=45?'Orta':toplam>=30?'Yetersiz':'Kritik';
+  tags.push({text:'veri kapsamı %'+mx,tip:mx>=80?'green':mx>=50?'orange':'red'});
+  if(d.found)tags.push({text:'OpenAlex',tip:'accent'});
+  if(o)tags.push({text:'ORCID',tip:'accent'});
+  if(cp&&cp.count)tags.push({text:cp.count+' öğrenci yorumu',tip:'accent'});
+
+  // Bulgular
+  function pr(n){var x=dims.filter(function(y){return y.isim===n;})[0];return x&&x.puan!=null?x.puan/x.max:null;}
+  if(!d.found)bulg.push({tip:'orange',ikon:'!',baslik:'OpenAlex kaydı yok. ',aciklama:'Uluslararası veritabanlarında yayını görünmüyor; araştırma boyutları puana katılmadı.'});
+  if(d.retracted>0)bulg.push({tip:'red',ikon:'✕',baslik:'Geri çekilen yayın. ',aciklama:d.retracted+' yayın geri çekilmiş görünüyor.'});
+  if(d.found&&d.recent_works===0)bulg.push({tip:'orange',ikon:'!',baslik:'Son 3 yılda yayın yok. ',aciklama:'Güncel akademik üretim görünmüyor.'});
+  if(d.found&&d.h_index>=15)bulg.push({tip:'green',ikon:'✓',baslik:'Güçlü atıf etkisi. ',aciklama:'H-indeksi '+d.h_index+'.'});
+  if(pr('Arastirma')!=null&&pr('Ogretim')!=null&&pr('Arastirma')>=0.6&&pr('Ogretim')<0.55)
+    bulg.push({tip:'orange',ikon:'!',baslik:'Yayın-öğretim dengesizliği. ',aciklama:'Araştırma metrikleri yüksek, ancak öğrenci değerlendirmeleri zayıf.'});
+  if(pr('Ogretim')!=null&&pr('Ogretim')>=0.75)bulg.push({tip:'green',ikon:'✓',baslik:'Öğrenciler memnun. ',aciklama:'Ortalama '+cp.genel+'/5 ('+cp.count+' yorum).'});
+  if(o&&o.fundings.length)bulg.push({tip:'green',ikon:'✓',baslik:'Proje/fon deneyimi. ',aciklama:o.fundings.length+' proje kaydı (ORCID).'});
+  if(!cp||!cp.count)bulg.push({tip:'accent',ikon:'·',baslik:'Öğrenci değerlendirmesi yok. ',aciklama:'Öğretim boyutu henüz hesaplanamadı; değerlendirmeler geldikçe puan güncellenir.'});
+  if(!o)bulg.push({tip:'accent',ikon:'·',baslik:'ORCID verisi yok. ',aciklama:'Etkinlik, proje ve hizmet boyutu hesaplanamadı.'});
+
+  // Unvan uyumu ve bir sonraki unvan (yaklaşık eşikler)
+  function uygun(esik){
+    var parts=[];
+    if(d.found){parts.push(esik.h?cap(d.h_index/esik.h):1);parts.push(esik.w?cap(d.works_count/esik.w):1);}
+    if(cp&&cp.count)parts.push(cap(cp.genel/3.5));
+    return parts.length?Math.round(parts.reduce(function(a,b){return a+b;},0)/parts.length*100):null;
+  }
+  var es=UNVAN_ESIK[unv]||{h:0,w:0},up=uygun(es),uyumDet=[];
+  if(d.found){uyumDet.push('h-indeksi '+d.h_index+(es.h?' / beklenen ~'+es.h:''));uyumDet.push('yayın '+d.works_count+(es.w?' / beklenen ~'+es.w:''));}
+  if(cp&&cp.count)uyumDet.push('öğrenci puanı '+cp.genel+'/5');
+  var uyum={puan:up==null?50:up,mesaj:up==null?'Değerlendirme için yeterli veri yok.':up>=70?'Unvanının gerektirdiği düzeyde.':up>=40?'Unvanına kısmen uyuyor.':'Unvanının beklentilerinin altında görünüyor.',detay:uyumDet};
+  var sn=UNVAN_SONRAKI[unv],sonraki={unvan:sn||'en yüksek unvanda',yakinlik:sn?(uygun(UNVAN_ESIK[sn])||0):100,eksik:[]};
+  if(sn){
+    var ne=UNVAN_ESIK[sn];
+    if(d.found&&d.h_index<ne.h)sonraki.eksik.push('h-indeksi '+d.h_index+' → ~'+ne.h);
+    if(d.found&&d.works_count<ne.w)sonraki.eksik.push('yayın '+d.works_count+' → ~'+ne.w);
+    if(!d.found)sonraki.eksik.push('indeksli yayın');
+    if(!cp||!cp.count)sonraki.eksik.push('öğrenci değerlendirmesi');
+    else if(cp.genel<3.5)sonraki.eksik.push('öğrenci puanı '+cp.genel+' → 3.5+');
+    var yil=d.recent_works/3;
+    if(d.found&&d.works_count<ne.w)sonraki.sure=yil>0?Math.max(1,Math.ceil((ne.w-d.works_count)/yil))+' yıl (mevcut hızla)':'belirsiz';
+  }
+  var r={isim:d.name||isim,univan:uni+(bol?' · '+bol:''),toplam_puan:toplam,grade:grade,etiketler:tags,boyutlar:dims,bulgular:bulg,uyum:uyum,sonraki:sonraki};
+  if(up!=null&&up<40&&mx>=50&&UNVAN_ONCEKI[unv])r.oneri_unvan=UNVAN_ONCEKI[unv];
+
+  var dimTxt=dims.map(function(x){return DIMTR[x.isim]+': '+(x.puan==null?'veri yok':x.puan+'/'+x.max);}).join('\n');
+  r.analiz='Toplam puan '+(toplam==null?'hesaplanamadı':toplam+'/100')+' (verisi olan boyutların toplamı '+mx+' puan üzerinden ölçeklendi).\n\n'+dimTxt+
+    '\n\nKaynaklar: '+[d.found?'OpenAlex':null,o?'ORCID':null,cp&&cp.count?cp.count+' onaylı öğrenci/mezun değerlendirmesi':null].filter(Boolean).join(', ')+'.';
+  return r;
 }
 
-function apiCall(msgs,cb){
-  fetch(API_BASE+'/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:SYS,tools:[{type:'web_search_20250305',name:'web_search'}],messages:msgs})
-  }).then(function(r){
-    if(!r.ok)return r.text().then(function(t){var m='API hatası: '+r.status;try{m=JSON.parse(t).error.message;}catch(x){}
-      if(m.indexOf('fetch')>-1||r.status===0){m='Bağlantı hatası. Proxy URL\'yi ayarlayın (PROXY_URL değişkeni).';}
-      cb(null,m);});
-    return r.json().then(function(d){cb(d,null);});
-  }).catch(function(e){
-    var msg=e.message||'Bilinmeyen hata';
-    if(msg.indexOf('fetch')>-1||msg.indexOf('CORS')>-1||msg.indexOf('Failed')>-1){
-      msg='Bağlantı hatası: CORS engeli. PROXY_URL değişkenine Cloudflare Worker adresinizi girin.';
-    }
-    cb(null,msg);
-  });
-}
-
-function finishErr(msg){clearInterval(TID);document.getElementById('prog').classList.remove('on');document.getElementById('sbtn').disabled=false;showErr('a-err',msg);}
 function finishOk(r,isim,uni,unv){
   clearInterval(TID);document.getElementById('prog').classList.remove('on');document.getElementById('sbtn').disabled=false;
   if(SB_READY){upsertHoca(r.isim||isim,uni,function(){});}
@@ -1155,7 +1319,9 @@ function render(r,fbI,fbU,unv){
   var pe=document.getElementById('rpuan');pe.textContent=r.toplam_puan!=null?r.toplam_puan:'—';pe.style.color=gc;
   var ge=document.getElementById('rgr');ge.textContent=GRTR[r.grade]||r.grade;ge.style.color=gc;
   document.getElementById('rdims').innerHTML=(r.boyutlar||[]).map(function(d){
-    var p=Math.round(d.puan/d.max*100),n=DIMTR[d.isim]||d.isim;
+    var n=DIMTR[d.isim]||d.isim;
+    if(d.puan==null)return'<div class="dimrow" style="opacity:.5"><div class="dname">'+n+'</div><div class="dtrack"></div><div class="dval">veri yok</div></div>';
+    var p=Math.round(d.puan/d.max*100);
     return'<div class="dimrow"><div class="dname">'+n+'</div><div class="dtrack"><div class="dfill" style="width:'+p+'%;background:var(--ink)"></div></div><div class="dval">'+d.puan+'/'+d.max+'</div></div>';
   }).join('');
   var uu=r.uyum||{},su=r.sonraki||{};
@@ -1190,18 +1356,6 @@ function render(r,fbI,fbU,unv){
 }
 
 /* ══ UTILS ══ */
-function parseJ(txt){
-  txt=txt.replace(/```json\s*/gi,'').replace(/```/g,'');
-  var s=txt.indexOf('{'),e=txt.lastIndexOf('}');if(s<0||e<0)return null;
-  var js=txt.slice(s,e+1);
-  try{return JSON.parse(js);}catch(err){
-    try{return{isim:sf(js,'isim')||'',univan:sf(js,'univan')||'',initials:sf(js,'initials')||'??',grade:sf(js,'grade')||'Orta',toplam_puan:nf(js,'toplam_puan')||50,etiketler:af(js,'etiketler'),boyutlar:af(js,'boyutlar'),bulgular:af(js,'bulgular'),uyum:of(js,'uyum'),sonraki:of(js,'sonraki'),oneri_unvan:sf(js,'oneri_unvan')||null};}catch(e2){return null;}
-  }
-}
-function sf(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*"([^"]*)"'));return m?m[1]:null;}
-function nf(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*(\\d+)'));return m?parseInt(m[1]):null;}
-function af(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*(\\[[\\s\\S]*?\\])(?=[,}])'));if(!m)return[];try{return JSON.parse(m[1]);}catch(e){return[];}}
-function of(s,k){var m=s.match(new RegExp('"'+k+'"\\s*:\\s*(\\{[^}]*\\})'));if(!m)return{};try{return JSON.parse(m[1]);}catch(e){return{};}}
 function showErr(id,m){var b=document.getElementById(id);if(!b)return;b.textContent=m;b.style.display=m?'block':'none';if(m)b.scrollIntoView({behavior:'smooth',block:'center'});}
 function setPtxt(t){document.getElementById('ptxt').textContent=t;}
 function stepSet(id,st){var e=document.getElementById(id);e.className='step'+(st?' '+st:'');var ic=e.querySelector('.sic');if(st==='act')ic.innerHTML='<span class="spin">◐</span>';else if(st==='ok')ic.textContent='✓';else if(st==='err')ic.textContent='✕';else ic.textContent='';}
