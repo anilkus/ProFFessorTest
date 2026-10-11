@@ -265,7 +265,53 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 .qi-text{font-size:14.5px;color:var(--ink);line-height:1.6;background:var(--paper2);border-radius:var(--r-sm);padding:.75rem .9rem;margin-bottom:.75rem}
 .qi-actions{display:flex;gap:.5rem}
 
+/* KEŞFET */
+.kf-head{padding:2.25rem 0 .25rem}
+.kf-head h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.2;letter-spacing:-.5px;color:var(--ink)}
+.kf-head p{color:var(--ink2);margin-top:.5rem;font-size:16px}
+.kf-filters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem;margin-top:1rem}
+.kf-filters label{font-size:14px}
+.kf-search{position:relative}
+.kf-search input{font-size:16px;padding:13px 16px 13px 42px;border-width:2px}
+.kf-search span{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:17px;pointer-events:none}
+.kf-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem;align-items:center}
+.kf-chips small{color:var(--ink3);font-size:13.5px;margin-right:.2rem}
+.kchip{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink2);background:var(--paper2);border:1.5px solid transparent;border-radius:999px;padding:5px 13px;cursor:pointer;transition:all .15s}
+.kchip:hover{border-color:var(--line2)}
+.kchip.on{background:var(--moss3);color:var(--moss);border-color:var(--moss2)}
+.kf-bar{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin:1.5rem 0 .75rem}
+.kf-count{font-size:15px;color:var(--ink2)}
+.kf-count b{color:var(--ink)}
+.kf-bar select{width:auto;padding:8px 34px 8px 12px;font-size:14px}
+.kf-bar .kf-right{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.kf-clear{background:none;border:none;color:var(--moss);font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;text-decoration:underline;padding:0}
+.kf-list{display:grid;gap:.85rem}
+.kcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:1.15rem 1.25rem;display:grid;grid-template-columns:1fr auto;gap:.4rem 1rem;align-items:start}
+.kcard h3{font-size:1.12rem;color:var(--ink);line-height:1.3}
+.kc-inst{font-size:14.5px;color:var(--ink2);margin-top:2px}
+.kc-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.55rem}
+.kc-tag{font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--paper2);color:var(--ink2)}
+.kc-tag.f{background:var(--moss3);color:var(--moss)}
+.kc-tag.o{background:var(--warn3);color:var(--warn)}
+.kc-stats{display:flex;gap:1.1rem;margin-top:.7rem;font-size:13.5px;color:var(--ink3)}
+.kc-stats b{display:block;font-size:1.05rem;color:var(--ink)}
+.kc-act{display:flex;flex-direction:column;gap:.45rem;align-self:center}
+.kc-act .btn{padding:8px 14px;font-size:13.5px}
+.kf-msg{text-align:center;color:var(--ink3);padding:2.5rem 1rem;background:var(--paper);border:1px dashed var(--line2);border-radius:var(--r)}
+.kf-pager{display:flex;justify-content:center;align-items:center;gap:.35rem;flex-wrap:wrap;margin-top:1.25rem}
+.kf-pager button{min-width:38px;padding:7px 11px;font-size:14px}
+.kf-pager button.on{background:var(--moss);color:var(--on-moss);border-color:var(--moss)}
+.kf-pager span{color:var(--ink3);padding:0 .2rem}
+.kskel{height:118px;border-radius:var(--r);background:linear-gradient(90deg,var(--paper2),var(--paper),var(--paper2));background-size:200% 100%;animation:ksk 1.2s infinite}
+@keyframes ksk{to{background-position:-200% 0}}
+.pulse{animation:pls 1.2s ease 2}
+@keyframes pls{50%{box-shadow:0 0 0 8px var(--moss3)}}
+
 @media(max-width:700px){
+  .kf-filters{grid-template-columns:1fr}
+  .kcard{grid-template-columns:1fr}
+  .kc-act{flex-direction:row;align-self:stretch}
+  .kc-act .btn{flex:1}
   nav{padding:.7rem 1rem;flex-wrap:wrap}
   .ltag,.nav-right{display:none}
   .nav-tabs{order:3;width:100%;justify-content:space-between}
@@ -308,8 +354,9 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
     <span class="ltag">akademisyenleri gerçek ölçütlerle tanı</span>
   </div>
   <div class="nav-tabs">
-    <button class="ntab on" onclick="goPage('analiz',this)">Ara</button>
-    <button class="ntab" onclick="goPage('yorum',this)">Değerlendir</button>
+    <button class="ntab on" id="tab-analiz" onclick="goPage('analiz',this)">Ara</button>
+    <button class="ntab" id="tab-kesfet" onclick="goPage('kesfet',this)">Keşfet</button>
+    <button class="ntab" id="tab-yorum" onclick="goPage('yorum',this)">Değerlendir</button>
     <button class="ntab gold" id="admin-tab" style="display:none" onclick="goPage('admin',this)">
       Admin <span id="admin-badge" style="display:none">0</span>
     </button>
@@ -428,6 +475,38 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 </div>
 
 <!-- ═══ YORUM ═══ -->
+<!-- ═══ KEŞFET ═══ -->
+<div id="pg-kesfet" class="page">
+  <div class="kf-head">
+    <h1>Akademisyenleri keşfet</h1>
+    <p>Türkiye'deki akademisyenleri üniversiteye, şehre ve alana göre bul. Birine tıkla, analiz et ya da değerlendir.</p>
+  </div>
+  <div class="form-section">
+    <div class="kf-search"><span>🔎</span><input type="text" id="kf-q" placeholder="İsim ya da konu yaz (ör. yapay zeka)…" autocomplete="off" oninput="kfQ()" onkeydown="if(event.key==='Enter'){clearTimeout(KF_QT);kfAra(1);}"></div>
+    <div class="kf-filters">
+      <div><label>Şehir</label><select id="kf-sehir" onchange="kfSehir()"><option value="">Tüm şehirler</option></select></div>
+      <div><label>Üniversite</label><select id="kf-uni" onchange="kfAra(1)"><option value="">Tüm üniversiteler</option></select></div>
+      <div><label>Alan</label><select id="kf-alan" onchange="kfAra(1)"><option value="">Tüm alanlar</option></select></div>
+    </div>
+    <div class="kf-chips" id="kf-chips"></div>
+  </div>
+  <div class="kf-bar">
+    <div class="kf-count" id="kf-count"></div>
+    <div class="kf-right">
+      <button class="kf-clear" id="kf-clear" onclick="kfTemizle()" style="display:none">Filtreleri temizle</button>
+      <select id="kf-sort" onchange="kfAra(1)" aria-label="Sıralama">
+        <option value="cited_by_count:desc">En çok atıf alan</option>
+        <option value="summary_stats.h_index:desc">En yüksek h-indeks</option>
+        <option value="works_count:desc">En çok yayın</option>
+        <option value="display_name">İsme göre (A-Z)</option>
+      </select>
+    </div>
+  </div>
+  <div class="kf-list" id="kf-list"></div>
+  <div class="kf-pager" id="kf-pager"></div>
+  <p class="form-note" style="text-align:center;margin-top:1rem">Veriler OpenAlex'ten gelir. Listede olmayan bir hocayı "Ara" sekmesinden isimle de arayabilirsin.</p>
+</div>
+
 <div id="pg-yorum" class="page">
   <div class="form-section">
     <div class="section-title">Kimi değerlendirmek istiyorsunuz?</div>
@@ -565,7 +644,7 @@ var GRTR={VeriAz:'yetersiz veri',Mukemmel:'mükemmel',Iyi:'iyi',Orta:'orta',Yete
 
 /* ══ SAYFA ══ */
 function anaSayfa(){
-  goPage('analiz',document.querySelector('.ntab'));
+  goPage('analiz',document.getElementById('tab-analiz'));
   if(history.replaceState&&location.search) history.replaceState(null,'',location.pathname);
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -575,11 +654,12 @@ function goPage(id,btn){
   document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on');});
   if(btn) btn.classList.add('on');
   if(id==='yorum') initHocaSelect();
+  if(id==='kesfet') kfInit();
   if(id==='admin'&&document.getElementById('admin-panel').classList.contains('on')) renderAdmin();
 }
 function goToYorum(){
   var isim=document.getElementById('risim').textContent;
-  goPage('yorum',document.querySelectorAll('.ntab')[1]);
+  goPage('yorum',document.getElementById('tab-yorum'));
   if(!isim) return;
   getHocalar(function(list){
     var h=list.find(function(h){return h.isim.toLowerCase().trim()===isim.toLowerCase().trim();});
@@ -692,7 +772,7 @@ function taslakKaydet(){
 function taslakYukle(){
   var t=null;try{t=JSON.parse(localStorage.getItem('pft_taslak')||'null');localStorage.removeItem('pft_taslak');}catch(e){}
   if(!t||!t.hoca)return;
-  goPage('yorum',document.querySelectorAll('.ntab')[1]);
+  goPage('yorum',document.getElementById('tab-yorum'));
   getHocalar(function(){setTimeout(function(){
     var sel=document.getElementById('sel-hoca');sel.value=t.hoca;if(sel.value!==t.hoca)return;
     loadProfil();
@@ -732,12 +812,15 @@ function updateBadge(){
 }
 
 /* ══ HOCA SELECT ══ */
-function initHocaSelect(){
-  var sel=document.getElementById('sel-hoca');
+var HS_SEQ=0;
+function initHocaSelect(secId){
+  var sel=document.getElementById('sel-hoca'),seq=++HS_SEQ;
   sel.innerHTML='<option value="">— yükleniyor —</option>';
   getHocalar(function(list){
+    if(seq!==HS_SEQ)return;
     sel.innerHTML='<option value="">— seçiniz —</option>';
     list.forEach(function(h){var o=document.createElement('option');o.value=h.id;o.textContent=h.isim+' — '+h.uni;sel.appendChild(o);});
+    if(secId){sel.value=secId;if(sel.value)loadProfil();}
   });
 }
 function hocaEkle(){
@@ -882,7 +965,7 @@ function adminLogin(){
   });
 }
 function adminLogout(){
-  if(SB_READY){SB.auth.signOut();goPage('analiz',document.querySelector('.ntab'));return;}
+  if(SB_READY){SB.auth.signOut();goPage('analiz',document.getElementById('tab-analiz'));return;}
   document.getElementById('admin-panel').classList.remove('on');document.getElementById('admin-login').style.display='block';document.getElementById('admin-pw').value='';
 }
 function renderAdmin(){
@@ -1271,14 +1354,136 @@ function stepSet(id,st){var e=document.getElementById(id);e.className='step'+(st
 function resetSteps(){['s1','s2','s3','s4','s5'].forEach(function(id){stepSet(id,'');});}
 function escH(s){return(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+/* ══ KEŞFET (üniversite / şehir / alan panosu) ══ */
+var KF_ALANLAR=[[17,'Bilgisayar Bilimleri'],[27,'Tıp'],[22,'Mühendislik'],[33,'Sosyal Bilimler'],[12,'Sanat ve Beşeri Bilimler'],[14,'İşletme ve Muhasebe'],[20,'Ekonomi ve Finans'],[32,'Psikoloji'],[26,'Matematik'],[31,'Fizik ve Astronomi'],[16,'Kimya'],[15,'Kimya Mühendisliği'],[25,'Malzeme Bilimi'],[21,'Enerji'],[23,'Çevre Bilimleri'],[19,'Yer ve Gezegen Bilimleri'],[11,'Tarım ve Biyoloji Bilimleri'],[13,'Biyokimya, Genetik ve Moleküler Biyoloji'],[24,'İmmünoloji ve Mikrobiyoloji'],[28,'Sinirbilim'],[30,'Farmakoloji ve Toksikoloji'],[29,'Hemşirelik'],[35,'Diş Hekimliği'],[34,'Veterinerlik'],[36,'Sağlık Meslekleri'],[18,'Karar Bilimleri']];
+var KF_ALAN_AD={};KF_ALANLAR.forEach(function(a){KF_ALAN_AD[a[0]]=a[1];});
+var KF_SIK=[17,27,22,33,14,32,26,23];
+var KF_SEHIR_TR={'Istanbul':'İstanbul','Izmir':'İzmir','Eskisehir':'Eskişehir','Canakkale':'Çanakkale','Corum':'Çorum','Mugla':'Muğla','Sanliurfa':'Şanlıurfa','Diyarbakir':'Diyarbakır','Elazig':'Elazığ','Kirikkale':'Kırıkkale','Kirsehir':'Kırşehir','Kutahya':'Kütahya','Nigde':'Niğde','Usak':'Uşak','Tekirdag':'Tekirdağ','Gumushane':'Gümüşhane','Agri':'Ağrı','Bingol':'Bingöl','Duzce':'Düzce','Karabuk':'Karabük','Igdir':'Iğdır','Sirnak':'Şırnak','Kahramanmaras':'Kahramanmaraş','Nevsehir':'Nevşehir','Aydin':'Aydın','Balikesir':'Balıkesir','Bartin':'Bartın','Mus':'Muş','Kirklareli':'Kırklareli','Zonguldak':'Zonguldak','Adiyaman':'Adıyaman','Artvin':'Artvin','Cankiri':'Çankırı'};
+var KF_UNIS=null,KF_SEQ=0,KF_PAGE=1,KF_RES=[],KF_QT=null,KF_PER=20;
+function kfSehirAd(c){return KF_SEHIR_TR[c]||c;}
+function kfInit(){
+  if(KF_UNIS){return;}
+  KF_UNIS=[];
+  var alan=document.getElementById('kf-alan');
+  KF_ALANLAR.slice().sort(function(a,b){return a[1].localeCompare(b[1],'tr');}).forEach(function(a){var o=document.createElement('option');o.value=a[0];o.textContent=a[1];alan.appendChild(o);});
+  document.getElementById('kf-chips').innerHTML='<small>Sık aranan alanlar:</small>'+KF_SIK.map(function(id){return'<button class="kchip" data-alan="'+id+'" onclick="kfChip('+id+')">'+KF_ALAN_AD[id]+'</button>';}).join('');
+  var u=new URLSearchParams(location.search);
+  if(u.get('q'))document.getElementById('kf-q').value=u.get('q');
+  if(u.get('alan'))alan.value=u.get('alan');
+  if(u.get('sort'))document.getElementById('kf-sort').value=u.get('sort');
+  var start=parseInt(u.get('p'),10)||1;
+  kfUnileriYukle(function(){
+    if(u.get('sehir')){document.getElementById('kf-sehir').value=u.get('sehir');kfUniDoldur();}
+    if(u.get('uni'))document.getElementById('kf-uni').value=u.get('uni');
+    kfAra(start);
+  });
+}
+function kfUnileriYukle(cb){
+  var cache=null;try{cache=JSON.parse(sessionStorage.getItem('pft_unis')||'null');}catch(e){}
+  if(cache&&cache.length){KF_UNIS=cache;kfSehirDoldur();kfUniDoldur();cb();return;}
+  var url=function(p){return'https://api.openalex.org/institutions?filter=country_code:TR,type:education&per_page=200&page='+p+'&sort=works_count:desc&select=id,display_name,geo,works_count'+OA_MAIL;};
+  Promise.all([1,2].map(function(p){return fetch(url(p)).then(function(r){return r.json();}).catch(function(){return{results:[]};});}))
+    .then(function(ds){
+      var seen={};
+      ds.forEach(function(d){(d.results||[]).forEach(function(i){var id=String(i.id).split('/').pop();if(seen[id])return;seen[id]=1;KF_UNIS.push({id:id,ad:i.display_name,sehir:(i.geo||{}).city||''});});});
+      try{if(KF_UNIS.length)sessionStorage.setItem('pft_unis',JSON.stringify(KF_UNIS));}catch(e){}
+      kfSehirDoldur();kfUniDoldur();cb();
+    });
+}
+function kfSehirDoldur(){
+  var sel=document.getElementById('kf-sehir'),say={};
+  KF_UNIS.forEach(function(u){if(u.sehir)say[u.sehir]=(say[u.sehir]||0)+1;});
+  sel.innerHTML='<option value="">Tüm şehirler</option>'+Object.keys(say).sort(function(a,b){return kfSehirAd(a).localeCompare(kfSehirAd(b),'tr');}).map(function(c){return'<option value="'+escH(c)+'">'+escH(kfSehirAd(c))+' ('+say[c]+')</option>';}).join('');
+}
+function kfUniDoldur(){
+  var sehir=document.getElementById('kf-sehir').value,sel=document.getElementById('kf-uni'),eski=sel.value;
+  var list=KF_UNIS.filter(function(u){return!sehir||u.sehir===sehir;}).sort(function(a,b){return a.ad.localeCompare(b.ad,'tr');});
+  sel.innerHTML='<option value="">'+(sehir?'Bu şehirdeki tüm üniversiteler':'Tüm üniversiteler')+'</option>'+list.map(function(u){return'<option value="'+u.id+'">'+escH(u.ad)+'</option>';}).join('');
+  if(list.some(function(u){return u.id===eski;}))sel.value=eski;
+}
+function kfSehir(){kfUniDoldur();kfAra(1);}
+function kfChip(id){var a=document.getElementById('kf-alan');a.value=(a.value==String(id))?'':String(id);kfAra(1);}
+function kfQ(){clearTimeout(KF_QT);KF_QT=setTimeout(function(){kfAra(1);},450);}
+function kfTemizle(){['kf-q','kf-sehir','kf-alan'].forEach(function(id){document.getElementById(id).value='';});kfUniDoldur();document.getElementById('kf-uni').value='';kfAra(1);}
+function kfAra(page){
+  KF_PAGE=page||1;
+  var q=document.getElementById('kf-q').value.trim(),sehir=document.getElementById('kf-sehir').value,uni=document.getElementById('kf-uni').value,alan=document.getElementById('kf-alan').value,sort=document.getElementById('kf-sort').value;
+  document.querySelectorAll('.kchip').forEach(function(c){c.classList.toggle('on',c.getAttribute('data-alan')===alan);});
+  document.getElementById('kf-clear').style.display=(q||sehir||uni||alan)?'':'none';
+  var f=['last_known_institutions.country_code:TR'];
+  if(uni)f.push('last_known_institutions.id:'+uni);
+  else if(sehir)f.push('last_known_institutions.geo.city:'+(/[\s,]/.test(sehir)?'"'+sehir+'"':sehir));
+  if(alan)f.push('topics.field.id:'+alan);
+  var url='https://api.openalex.org/authors?filter='+encodeURIComponent(f.join(','))+'&per_page='+KF_PER+'&page='+KF_PAGE+(q?'&search='+encodeURIComponent(q):'&sort='+sort)+'&select=id,display_name,orcid,works_count,cited_by_count,summary_stats,last_known_institutions,topics'+OA_MAIL;
+  var p=new URLSearchParams();p.set('sayfa','kesfet');if(q)p.set('q',q);if(sehir)p.set('sehir',sehir);if(uni)p.set('uni',uni);if(alan)p.set('alan',alan);if(sort!=='cited_by_count:desc')p.set('sort',sort);if(KF_PAGE>1)p.set('p',KF_PAGE);
+  if(history.replaceState)history.replaceState(null,'',location.pathname+'?'+p.toString());
+  var seq=++KF_SEQ,list=document.getElementById('kf-list');
+  list.innerHTML='<div class="kskel"></div><div class="kskel"></div><div class="kskel"></div>';
+  document.getElementById('kf-pager').innerHTML='';document.getElementById('kf-count').textContent='aranıyor…';
+  fetch(url).then(function(r){if(!r.ok)throw r.status;return r.json();}).then(function(d){
+    if(seq!==KF_SEQ)return;
+    KF_RES=d.results||[];var n=(d.meta||{}).count||0;
+    var son=Math.max(1,Math.ceil(Math.min(n,10000)/KF_PER));
+    document.getElementById('kf-count').innerHTML=n?'<b>'+n.toLocaleString('tr')+'</b> akademisyen · sayfa '+KF_PAGE+' / '+son.toLocaleString('tr'):'';
+    if(!KF_RES.length){list.innerHTML='<div class="kf-msg">Bu filtrelerle kimse bulunamadı. Bir filtreyi kaldırmayı dene.</div>';return;}
+    list.innerHTML=KF_RES.map(kfKart).join('');
+    kfPager(son);
+  }).catch(function(){if(seq!==KF_SEQ)return;document.getElementById('kf-count').textContent='';list.innerHTML='<div class="kf-msg">OpenAlex\'e şu an ulaşılamadı. Biraz sonra tekrar dene.</div>';});
+}
+function kfInstOf(a){var l=a.last_known_institutions||[];return l.filter(function(i){return i.country_code==='TR';})[0]||l[0]||null;}
+function kfKart(a,i){
+  var inst=kfInstOf(a),iid=inst?String(inst.id).split('/').pop():'';
+  var u=KF_UNIS&&KF_UNIS.filter(function(x){return x.id===iid;})[0];
+  var tags=[],alanlar={};
+  (a.topics||[]).slice(0,4).forEach(function(t){var fid=t.field&&String(t.field.id).split('/').pop();if(fid&&!alanlar[fid]){alanlar[fid]=1;tags.push('<span class="kc-tag f">'+escH(KF_ALAN_AD[fid]||t.field.display_name)+'</span>');}});
+  var top=(a.topics||[])[0];if(top)tags.push('<span class="kc-tag">'+escH(top.display_name)+'</span>');
+  if(a.orcid)tags.push('<span class="kc-tag o">ORCID</span>');
+  var s=a.summary_stats||{};
+  return'<div class="kcard"><div><h3>'+escH(a.display_name)+'</h3><div class="kc-inst">'+(inst?escH(inst.display_name):'Kurum bilgisi yok')+(u&&u.sehir?' · 📍 '+escH(kfSehirAd(u.sehir)):'')+'</div>'+
+    '<div class="kc-tags">'+tags.slice(0,4).join('')+'</div>'+
+    '<div class="kc-stats"><span><b>'+(s.h_index!=null?s.h_index:'–')+'</b>h-indeks</span><span><b>'+(a.works_count||0).toLocaleString('tr')+'</b>yayın</span><span><b>'+(a.cited_by_count||0).toLocaleString('tr')+'</b>atıf</span></div></div>'+
+    '<div class="kc-act"><button class="btn primary" onclick="kfAnaliz('+i+')">Analiz et</button><button class="btn" onclick="kfDegerlendir('+i+')">Değerlendir</button></div></div>';
+}
+function kfPager(son){
+  var c=KF_PAGE,b=[],add=function(n){b.push('<button class="btn'+(n===c?' on':'')+'" onclick="kfGit('+n+')">'+n+'</button>');};
+  if(son<=1){document.getElementById('kf-pager').innerHTML='';return;}
+  b.push('<button class="btn" onclick="kfGit('+(c-1)+')"'+(c<=1?' disabled':'')+'>← Önceki</button>');
+  var lo=Math.max(1,c-2),hi=Math.min(son,c+2);
+  if(lo>1){add(1);if(lo>2)b.push('<span>…</span>');}
+  for(var n=lo;n<=hi;n++)add(n);
+  if(hi<son){if(hi<son-1)b.push('<span>…</span>');add(son);}
+  b.push('<button class="btn" onclick="kfGit('+(c+1)+')"'+(c>=son?' disabled':'')+'>Sonraki →</button>');
+  document.getElementById('kf-pager').innerHTML=b.join('');
+}
+function kfGit(n){if(n<1)return;kfAra(n);window.scrollTo({top:document.getElementById('kf-count').getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});}
+function kfSec(i){
+  var a=KF_RES[i];if(!a)return null;
+  AC_RES=[{id:a.id,display_name:a.display_name,orcid:a.orcid,last_known_institutions:a.last_known_institutions}];
+  acPick(0);return a;
+}
+function kfAnaliz(i){
+  if(!kfSec(i))return;
+  goPage('analiz',document.getElementById('tab-analiz'));
+  var fu=document.getElementById('fu');fu.scrollIntoView({behavior:'smooth',block:'center'});
+  var b=document.getElementById('sbtn');b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');
+}
+function kfDegerlendir(i){
+  var a=kfSec(i);if(!a)return;
+  var inst=kfInstOf(a);
+  goPage('yorum',document.getElementById('tab-yorum'));
+  var isim=a.display_name,uni=inst?inst.display_name:'';
+  insertHoca(isim,uni,function(h){initHocaSelect(h&&h.id);});
+}
+
 initHocaSelect();
 updateBadge();
 renderAuthBox();
 adminUI();
 (function(){
   var sayfa=new URLSearchParams(location.search).get('sayfa');
-  if(sayfa==='admin')goPage('admin',document.querySelectorAll('.ntab')[2]);
-  else if(sayfa==='yorum'){goPage('yorum',document.querySelectorAll('.ntab')[1]);taslakYukle();}
+  if(sayfa==='admin')goPage('admin',document.getElementById('admin-tab'));
+  else if(sayfa==='kesfet')goPage('kesfet',document.getElementById('tab-kesfet'));
+  else if(sayfa==='yorum'){goPage('yorum',document.getElementById('tab-yorum'));taslakYukle();}
 })();
 </script>
 </body>
